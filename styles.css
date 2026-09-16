@@ -135,7 +135,7 @@
 }
 
 .agency-index__intro {
-  color: #cfc7b8 !important;
+  color: #fff !important;
   margin: .45rem auto 0 !important;
   max-width: 38rem;
 }
@@ -354,7 +354,7 @@
   text-transform: uppercase;
 }
 
-.agency-intelligence__placeholder p { color: #c7c0b4 !important; font-size: 1.08rem !important; }
+.agency-intelligence__placeholder p { color: #fff !important; font-size: 1.08rem !important; }
 
 .agency-intelligence__panel { animation: agency-file-release .38s ease both; padding: .5rem 0 .25rem; }
 .agency-intelligence__panel[hidden] { display: none !important; }
@@ -870,6 +870,15 @@ body.page-id-32 .entry-content strong,
 body.home .entry-content strong,
 body.home .entry-content b { color: #fff !important; }
 
+/* Services Listing (page-id-9): match the homepage white body treatment.
+   Color only -- type scale, gold headings, and link colors are unchanged. */
+body.page-id-9 .entry-content > p,
+body.page-id-9 .entry-content li,
+body.page-id-9 .entry-content blockquote p,
+body.page-id-9 .entry-content strong,
+body.page-id-9 .entry-content b,
+body.page-id-9 .entry-content em { color: #fff !important; }
+
 /* Widgets */
 .sidebar .widget, .footer-widgets .widget {
   background: linear-gradient(145deg, var(--alpha-panel-raised), var(--alpha-ink)) !important;
@@ -964,6 +973,26 @@ fieldset { border-color: var(--alpha-line) !important; }
   color: var(--alpha-ivory) !important;
 }
 .application-field small { color: var(--alpha-muted) !important; }
+
+/* Careers (page-id-22): match the homepage white body treatment.
+   Color only -- gold job-fact labels and the green status chip are preserved below. */
+body.page-id-22 .entry-content p,
+body.page-id-22 .entry-content li,
+body.page-id-22 .entry-content dt,
+body.page-id-22 .entry-content dd,
+body.page-id-22 .entry-content small,
+body.page-id-22 .entry-content strong,
+body.page-id-22 .entry-content b,
+body.page-id-22 .entry-content em,
+body.page-id-22 .lab-tech-opening,
+body.page-id-22 .application-preview,
+body.page-id-22 .lab-tech-opening h2,
+body.page-id-22 .application-preview h2,
+body.page-id-22 .job-fact,
+body.page-id-22 .application-note,
+body.page-id-22 .application-field small { color: #fff !important; }
+body.page-id-22 .job-fact strong { color: var(--alpha-gold-bright) !important; }
+body.page-id-22 .application-status { color: #c8efcc !important; }
 .application-status {
   background: rgba(85,150,91,.13) !important;
   border-color: #55965b !important;
@@ -1408,7 +1437,7 @@ table.locations .phone-link { border-bottom: 0; }
   width: 74px;
 }
 .location-intelligence__locked p {
-  color: var(--alpha-ivory) !important;
+  color: #fff !important;
   font-family: var(--alpha-display);
   font-size: 1.25rem;
   font-weight: 700;
@@ -1417,7 +1446,7 @@ table.locations .phone-link { border-bottom: 0; }
   text-transform: uppercase;
 }
 .location-intelligence__locked small {
-  color: var(--alpha-muted);
+  color: #fff;
   display: block;
   margin-top: .5rem;
 }
@@ -2470,7 +2499,7 @@ input[type="submit"],
 }
 .kit-folder summary::-webkit-details-marker { display: none; }
 .kit-folder summary strong { display: block; color: #fff !important; font: 700 clamp(1.1rem,2vw,1.5rem) var(--alpha-display); line-height: 1.15; }
-.kit-folder summary small { display: block; margin-top: 5px; color: #d0c5ac; line-height: 1.4; font-size: .8rem; }
+.kit-folder summary small { display: block; margin-top: 5px; color: #fff; line-height: 1.4; font-size: .8rem; }
 .kit-folder__number { color: #ffd24f; font: 700 1.4rem var(--alpha-display); }
 .kit-folder__toggle { color: #ffd24f; font-size: 1.6rem; transition: transform .25s; }
 .kit-folder summary:hover { background: linear-gradient(120deg,#463514,#0e0c08 80%); }
@@ -2485,7 +2514,7 @@ input[type="submit"],
 }
 .kit-document:last-child { border-bottom: 0; }
 .kit-document strong { display: block; color: #fff !important; font-size: 1rem; line-height: 1.35; }
-.kit-document small { display: block; margin-top: 5px; color: #c6bdab; font-size: .75rem; line-height: 1.45; }
+.kit-document small { display: block; margin-top: 5px; color: #fff; font-size: .75rem; line-height: 1.45; }
 .kit-document__type { color: #ffd24f; white-space: nowrap; font: 700 .75rem var(--alpha-display); letter-spacing: .08em; }
 .kit-document:hover strong, .kit-document:focus-visible strong { color: #ffe392 !important; }
 .kit-document:hover { background: rgba(212,175,55,.06); }
