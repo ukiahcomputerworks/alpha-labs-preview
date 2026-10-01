@@ -9,9 +9,9 @@ param(
 
 $ErrorActionPreference = 'Stop'
 $projectRoot = Split-Path -Parent $MyInvocation.MyCommand.Path
-$expectedRoot = 'C:\Users\Admin\OneDrive - CWU\Apps\Prospect-Web-Mockups\alpha-labs-48hr-preview'
-$liveUrl = 'https://ukiahcomputerworks.github.io/alpha-labs-48hr-preview/'
-$repository = 'ukiahcomputerworks/alpha-labs-48hr-preview'
+$expectedRoot = 'C:\Users\Admin\OneDrive - CWU\Apps\Prospect-Web-Mockups\alpha-labs-preview'
+$liveUrl = 'https://ukiahcomputerworks.github.io/alpha-labs-preview/'
+$repository = 'ukiahcomputerworks/alpha-labs-preview'
 
 if ((Resolve-Path -LiteralPath $projectRoot).Path -ne $expectedRoot) {
     throw "Unexpected project root: $projectRoot"

@@ -19,7 +19,7 @@ if ($stagedHtml -notmatch 'No information is transmitted, stored, or sent') {
 }
 
 $currentHtml = Get-Content -Raw -LiteralPath $livePage
-$stylesheetPattern = '(?:https://ukiahcomputerworks\.github\.io/alpha-labs-48hr-preview/|\.\./|\.\./\.\./)?styles\.css\?v=\d+'
+$stylesheetPattern = '(?:https://ukiahcomputerworks\.github\.io/alpha-labs-preview/|\.\./|\.\./\.\./)?styles\.css\?v=\d+'
 $currentStylesheet = [regex]::Match($currentHtml, $stylesheetPattern)
 if (-not $currentStylesheet.Success) {
     throw 'The active Careers page does not contain the expected versioned stylesheet URL.'

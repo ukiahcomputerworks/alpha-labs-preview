@@ -4,7 +4,7 @@ Independent, route-for-route static mirror of the public Alpha Analytical Labora
 
 ## Live staged site
 
-`https://ukiahcomputerworks.github.io/alpha-labs-48hr-preview/`
+`https://ukiahcomputerworks.github.io/alpha-labs-preview/`
 
 ## Meeting workflow
 

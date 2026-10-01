@@ -91,7 +91,7 @@ foreach ($serviceMarker in @('Our Testing &amp; Analytical Services', 'Certified
     if (-not $services.Contains($serviceMarker)) { $failures.Add("Missing approved Services Listing copy: $serviceMarker") }
 }
 foreach ($serviceTarget in @('drinking-bottled-water-program/', 'wastewater-recycled-water-storm-water-ground-water-program-work/', 'potw-pretreatment-program-work/', 'soil-sludge-sediment-haz-waste-characterization/')) {
-    if (-not $services.Contains("alpha-labs-48hr-preview/$serviceTarget")) { $failures.Add("Missing Services Listing destination: $serviceTarget") }
+    if (-not $services.Contains("alpha-labs-preview/$serviceTarget")) { $failures.Add("Missing Services Listing destination: $serviceTarget") }
 }
 if ($services -notmatch 'mailto:robbie@alpha-labs\.com' -or $services -notmatch 'https://aquaticinformatics\.com/products/wastewater-compliance-software/' -or $services -match 'Read More&#8230;') {
     $failures.Add('The Services Listing actions, official WaterTrax destination, or redundant Read More cleanup are incomplete.')

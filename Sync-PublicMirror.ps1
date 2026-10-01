@@ -3,9 +3,9 @@ param()
 
 $ErrorActionPreference = 'Stop'
 $projectRoot = Split-Path -Parent $MyInvocation.MyCommand.Path
-$expectedRoot = 'C:\Users\Admin\OneDrive - CWU\Apps\Prospect-Web-Mockups\alpha-labs-48hr-preview'
+$expectedRoot = 'C:\Users\Admin\OneDrive - CWU\Apps\Prospect-Web-Mockups\alpha-labs-preview'
 $sourceOrigin = 'https://www.alpha-labs.com'
-$previewOrigin = 'https://ukiahcomputerworks.github.io/alpha-labs-48hr-preview'
+$previewOrigin = 'https://ukiahcomputerworks.github.io/alpha-labs-preview'
 $sitemaps = @(
     "$sourceOrigin/wp-sitemap-posts-page-1.xml",
     "$sourceOrigin/wp-sitemap-posts-post-1.xml"
