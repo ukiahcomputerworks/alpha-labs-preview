@@ -49,7 +49,8 @@ try {
     assert.ok(state.input.right <= state.client.left + 1, `search precedes Client Data Access at ${width}px`);
     assert.ok(state.panel.left >= -1 && state.panel.right <= width + 1, `results fit viewport at ${width}px: ${JSON.stringify(state.panel)}`);
     assert.ok(state.documentWidth <= state.viewportWidth + 1, `no horizontal scroll at ${width}px`);
-    assert.equal(new URL(state.href, baseUrl).pathname, '/forms/', 'coliform result links to indexed Forms page');
+    assert.equal(new URL(state.href, `${baseUrl}/`).pathname, new URL('forms/', `${baseUrl}/`).pathname,
+      'coliform result links to indexed Forms page');
     assert.deepEqual(errors, [], `no browser errors at ${width}px`);
     checks += 5;
     if (width === 390) {
