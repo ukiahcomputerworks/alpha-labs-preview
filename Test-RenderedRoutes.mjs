@@ -272,6 +272,16 @@ try {
             const tabRects = tabs.map((tab) => tab.getBoundingClientRect());
             const railRect = rail?.getBoundingClientRect();
             const dossierRect = dossier?.getBoundingClientRect();
+            const entryHeaderRect = document.querySelector('.entry-header')?.getBoundingClientRect();
+            const vaultRect = document.querySelector('.service-vault')?.getBoundingClientRect();
+            const mastheadRect = document.querySelector('.service-vault__masthead')?.getBoundingClientRect();
+            const posterRect = document.querySelector('.service-vault__poster')?.getBoundingClientRect();
+            const headlineSpans = [...document.querySelectorAll('#service-vault-title span')];
+            const firstHeadlineRect = headlineSpans[0]?.getBoundingClientRect();
+            const secondHeadlineRect = headlineSpans[1]?.getBoundingClientRect();
+            const firstServiceTest = visiblePanels[0]?.querySelector('.service-test-list li');
+            const dossierStyle = dossier && getComputedStyle(dossier);
+            const dossierCornerStyle = dossier && getComputedStyle(dossier, '::before');
             return {
               title: titleElement?.textContent.trim(),
               titleFitsOneLine: Boolean(titleElement && titleStyle && titleElement.scrollWidth <= titleElement.clientWidth + 1 && titleElement.clientHeight <= parseFloat(titleStyle.lineHeight) + 2 && titleStyle.whiteSpace === 'nowrap'),
@@ -292,6 +302,18 @@ try {
               soilHref: soil?.href,
               emailHref: email?.getAttribute('href'),
               oldReadMore: document.querySelector('.entry-content')?.textContent.includes('Read More'),
+              headlineBreakIsExact: Boolean(
+                headlineSpans[0]?.textContent === 'Two sides of water.'
+                && headlineSpans[1]?.textContent === 'One laboratory.'
+                && firstHeadlineRect
+                && secondHeadlineRect
+                && secondHeadlineRect.top > firstHeadlineRect.top + 2
+              ),
+              titleToVaultGap: entryHeaderRect && vaultRect ? vaultRect.top - entryHeaderRect.bottom : null,
+              mastheadToPosterGap: mastheadRect && posterRect ? posterRect.top - mastheadRect.bottom : null,
+              serviceTestListStyle: firstServiceTest ? getComputedStyle(firstServiceTest).listStyleType : null,
+              dossierBorderWidth: dossierStyle?.borderTopWidth,
+              dossierCornerDisplay: dossierCornerStyle?.display,
             };
           });
           if (servicesState.title !== 'Our Testing & Analytical Services' || servicesState.tabCount !== 2 || servicesState.panelCount !== 2 || servicesState.activeTarget !== 'drinking' || servicesState.visiblePanel !== 'drinking' || servicesState.visiblePanelCount !== 1 || servicesState.testsInVisiblePanel < 6 || servicesState.watertraxHref !== 'https://aquaticinformatics.com/products/wastewater-compliance-software/' || servicesState.emailHref !== 'mailto:robbie@alpha-labs.com' || !servicesState.potwHref?.endsWith('/potw-pretreatment-program-work/') || !servicesState.soilHref?.endsWith('/soil-sludge-sediment-haz-waste-characterization/') || servicesState.oldReadMore) {
@@ -300,6 +322,11 @@ try {
           if (!servicesState.drinkingHref?.endsWith('/drinking-bottled-water-program/') || !servicesState.wastewaterHref?.endsWith('/wastewater-recycled-water-storm-water-ground-water-program-work/')) failures.push(`${viewport.name} ${route}: primary water-program destinations changed`);
           if (!servicesState.titleFitsOneLine) failures.push(`${viewport.name} ${route}: service title does not fit on one line`);
           if (!servicesState.titleShimmersGold) failures.push(`${viewport.name} ${route}: service title is missing its gold shimmer`);
+          if (!servicesState.headlineBreakIsExact) failures.push(`${viewport.name} ${route}: dual-water headline does not break exactly after “water.”`);
+          if (servicesState.titleToVaultGap !== null && servicesState.titleToVaultGap > 24) failures.push(`${viewport.name} ${route}: excess space remains between the page title and service vault (${servicesState.titleToVaultGap}px)`);
+          if (servicesState.mastheadToPosterGap !== null && servicesState.mastheadToPosterGap > 24) failures.push(`${viewport.name} ${route}: excess space remains between the vault masthead and dual-water statement (${servicesState.mastheadToPosterGap}px)`);
+          if (servicesState.serviceTestListStyle !== 'none') failures.push(`${viewport.name} ${route}: browser list markers collide with the service-card edge`);
+          if (viewport.name === 'phone' && (servicesState.dossierBorderWidth !== '0px' || servicesState.dossierCornerDisplay !== 'none')) failures.push(`${viewport.name} ${route}: nested service-card borders remain on mobile`);
           if (!servicesState.tabsStacked) failures.push(`${viewport.name} ${route}: the two water program cards are not stacked`);
           if (viewport.name === 'phone' ? !servicesState.mobileStack : !servicesState.desktopColumns) failures.push(`${viewport.name} ${route}: service selector and dossier are not in the approved responsive arrangement`);
 

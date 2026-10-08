@@ -32,11 +32,11 @@
   border-top-color: transparent;
   clip-path: polygon(0 0, calc(100% - 28px) 0, 100% 28px, 100% 100%, 28px 100%, 0 calc(100% - 28px));
   display: grid;
-  gap: clamp(1rem, 2vw, 1.5rem) clamp(1.5rem, 3vw, 2.75rem);
+  gap: clamp(.7rem, 1.2vw, 1rem) clamp(1.5rem, 3vw, 2.75rem);
   grid-template-columns: minmax(280px, .78fr) minmax(410px, 1.22fr);
-  margin: .75rem 0 1rem;
+  margin: .3rem 0 1rem;
   overflow: visible;
-  padding: clamp(1.1rem, 2.4vw, 2.25rem);
+  padding: clamp(1rem, 1.45vw, 1.4rem);
   position: relative;
 }
 
@@ -103,7 +103,7 @@
   font-size: .75rem !important;
   font-weight: 700;
   letter-spacing: .22em;
-  margin: 0 0 .55rem !important;
+  margin: 0 0 .3rem !important;
   text-transform: uppercase;
 }
 
@@ -132,7 +132,7 @@
   color: #fff !important;
   font-size: 1.05rem !important;
   line-height: 1.55;
-  margin: .8rem auto 0 !important;
+  margin: .55rem auto 0 !important;
   max-width: 690px;
 }
 
@@ -339,6 +339,8 @@
   margin: 0 0 1.7rem !important;
   padding: 0 !important;
 }
+.entry-content .service-test-list,
+.entry-content .service-test-list li { list-style: none !important; }
 .entry-content .service-test-list li {
   border-bottom: 1px solid rgba(255, 210, 79, .25);
   color: #fff !important;
@@ -397,7 +399,6 @@
   .service-vault__masthead span { padding-inline: .35rem; }
   .service-vault__poster { padding: 1rem 1.5rem; }
   .entry-content .service-vault__poster h2 { font-size: clamp(1.7rem, 9vw, 2.45rem) !important; }
-  .service-vault__poster h2 span { display: block; }
   .entry-content .service-vault__poster > p:last-child { font-size: .92rem !important; }
   .service-tab { height: 205px; padding: 0 !important; }
   .service-tab.is-active { translate: .25rem 0; }
@@ -406,9 +407,18 @@
   .service-tab__copy small { font-size: .62rem; }
   .service-tab__copy > span { font-size: .66rem; }
   .service-tab__number { left: .8rem; top: .8rem; }
-  .service-intelligence { padding: 1.3rem 1rem 1.5rem; }
+  .service-intelligence {
+    background: linear-gradient(155deg, rgba(18, 17, 14, .72), rgba(1, 1, 1, .82));
+    border: 0;
+    clip-path: none;
+    padding: 1rem .55rem 1.15rem;
+  }
+  .service-intelligence::before,
+  .service-intelligence::after { display: none; }
+  .service-intelligence__panel { padding-top: 0; }
   .entry-content .service-intelligence h2 { font-size: clamp(1.8rem, 10vw, 2.6rem) !important; }
-  .service-test-list { grid-template-columns: minmax(0, 1fr); }
+  .service-test-list { grid-template-columns: minmax(0, 1fr); padding-left: 0 !important; }
+  .entry-content .service-test-list li { padding-left: 1.15rem; }
   .service-intelligence__actions { display: grid; }
 }
 
