@@ -102,6 +102,23 @@ try {
   checks += 4;
   await documentPage.close();
 
+  const ocrOnlyTerm = Object.entries(documentIndex.terms).find(([word, postings]) =>
+    word.length >= 8 && /^[a-z]+$/.test(word) && !index.terms[word] &&
+    postings.some(([id]) => documentIndex.documents[id].method === 'ocr'));
+  if (ocrOnlyTerm) {
+    const [word, postings] = ocrOnlyTerm;
+    const expectedTitle = documentIndex.documents[postings.find(([id]) => documentIndex.documents[id].method === 'ocr')[0]].title;
+    const actualDocumentPage = await browser.newPage({ viewport: { width: 390, height: 844 } });
+    await actualDocumentPage.goto(`${baseUrl}/`, { waitUntil: 'domcontentloaded' });
+    await actualDocumentPage.locator('#alpha-site-search-input').fill(word);
+    await actualDocumentPage.locator('#alpha-site-search-results a').first().waitFor();
+    assert.match(await actualDocumentPage.locator('.alpha-site-search__summary').innerText(), /0 pages · [1-9]\d* documents/);
+    assert.ok((await actualDocumentPage.locator('#alpha-site-search-results a strong').allTextContents()).includes(expectedTitle),
+      'a real OCR document appears in the search results');
+    checks += 2;
+    await actualDocumentPage.close();
+  }
+
   const routePage = await browser.newPage();
   for (const item of manifest) {
     const route = item.Route === '/' ? '/' : item.Route.endsWith('.html') ? item.Route : `${item.Route}/`;
