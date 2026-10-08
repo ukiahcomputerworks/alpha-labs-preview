@@ -38,11 +38,11 @@ foreach ($item in $manifest) {
     if ($html -notmatch '<meta name="viewport" content="width=device-width, initial-scale=1"') {
         $failures.Add("Missing responsive viewport: $($item.Route)")
     }
-    if ($html -notmatch 'styles\.css\?v=65') {
-        $failures.Add("Missing Alpha After Dark design cache key v65: $($item.Route)")
+    if ($html -notmatch 'styles\.css\?v=66') {
+        $failures.Add("Missing Alpha After Dark design cache key v66: $($item.Route)")
     }
-    if ($html -notmatch 'script\.js\?v=15') {
-        $failures.Add("Missing Alpha After Dark behavior cache key v14: $($item.Route)")
+    if ($html -notmatch 'script\.js\?v=16') {
+        $failures.Add("Missing Alpha After Dark behavior cache key v16: $($item.Route)")
     }
     $contactNavPosition = $html.IndexOf('id="menu-item-170"')
     $regulatoryNavPosition = $html.IndexOf('id="menu-item-176"')

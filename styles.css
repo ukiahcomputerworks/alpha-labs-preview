@@ -2278,6 +2278,10 @@ input[type="submit"],
   .alpha-action-rail > a:nth-child(4) { border-top: 1px solid rgba(255, 210, 79, .18); }
 }
 
+#company-locations {
+  scroll-margin-top: 7rem;
+}
+
 /* Keep the full opening statement and both actions visible on short desktop screens. */
 @media (min-width: 783px) and (max-height: 900px) {
   #slider.alpha-after-dark-enabled,

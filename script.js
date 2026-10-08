@@ -62,7 +62,7 @@ if (homeSlider && !homeSlider.querySelector('.alpha-after-dark')) {
   actionRail.className = 'alpha-action-rail';
   actionRail.setAttribute('aria-label', 'Start here');
   actionRail.innerHTML = `
-    <a href="tel:+17074680401">
+    <a href="#company-locations">
       <span class="alpha-action-rail__number">01</span>
       <span><strong>Not sure what to test?</strong><small>Call the laboratory</small></span>
     </a>
@@ -70,9 +70,9 @@ if (homeSlider && !homeSlider.querySelector('.alpha-after-dark')) {
       <span class="alpha-action-rail__number">02</span>
       <span><strong>Know what you brought?</strong><small>Choose a testing service</small></span>
     </a>
-    <a href="https://www.google.com/maps/@?api=1&amp;map_action=pano&amp;pano=hrSOhWrCACuB3DL7BAOeWw&amp;viewpoint=39.1522388%2C-123.2055537&amp;heading=265.94&amp;pitch=3&amp;fov=75" target="_blank" rel="noopener noreferrer">
+    <a href="contact-us-alpha-analytical-laboratories-inc/">
       <span class="alpha-action-rail__number">03</span>
-      <span><strong>See where science happens</strong><small>Visit the Ukiah laboratory</small></span>
+      <span><strong>See where science happens</strong><small>Choose your laboratory location</small></span>
     </a>
     <a href="https://alpha-labs.promium.com/" target="_blank" rel="noopener noreferrer">
       <span class="alpha-action-rail__number">04</span>

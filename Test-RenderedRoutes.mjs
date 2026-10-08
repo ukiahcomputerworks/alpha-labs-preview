@@ -86,6 +86,7 @@ try {
             const specsHeading = document.querySelector('.entry-content > h2');
             const bodyCopy = [...document.querySelectorAll('.entry-content > p, .entry-content li')];
             const actionCards = [...document.querySelectorAll('.alpha-action-rail > a')];
+            const companyLocations = document.querySelector('#company-locations');
             const heroContent = document.querySelector('.alpha-after-dark__content');
             const heroActions = document.querySelector('.alpha-after-dark__actions');
             const heroContentRect = heroContent?.getBoundingClientRect();
@@ -128,6 +129,10 @@ try {
               bodyCopyReadable,
               actionRailTreatment,
               actionRailStaggered,
+              actionOneHref: actionCards[0]?.getAttribute('href') || '',
+              actionThreeHref: actionCards[2]?.getAttribute('href') || '',
+              actionThreeCopy: actionCards[2]?.querySelector('small')?.textContent.trim() || '',
+              companyLocationsIsFocusable: companyLocations?.getAttribute('tabindex') === '-1',
               compactHeroFits: !heroContentRect || !heroActionsRect || (
                 heroContentRect.top >= -1
                 && heroActionsRect.bottom <= window.innerHeight + 1
@@ -140,7 +145,26 @@ try {
           if (!homeStoryState.headingsAreGold || !homeStoryState.headingSizesPreserved) failures.push(`${viewport.name} ${route}: homepage headings are not gold or their established sizes changed`);
           if (!homeStoryState.bodyCopyReadable) failures.push(`${viewport.name} ${route}: homepage body copy is not solid white and larger than the base text`);
           if (!homeStoryState.actionRailTreatment || !homeStoryState.actionRailStaggered) failures.push(`${viewport.name} ${route}: homepage action rail is missing the gold-and-white treatment or independent shimmer timing`);
+          if (homeStoryState.actionOneHref !== '#company-locations' || !homeStoryState.companyLocationsIsFocusable) failures.push(`${viewport.name} ${route}: action 01 does not target the accessible Company Locations phone directory`);
+          if (!homeStoryState.actionThreeHref.endsWith('contact-us-alpha-analytical-laboratories-inc/') || homeStoryState.actionThreeCopy !== 'Choose your laboratory location') failures.push(`${viewport.name} ${route}: action 03 does not route to the location-neutral Contact selector`);
           if (viewport.name === 'compact-desktop' && !homeStoryState.compactHeroFits) failures.push(`${viewport.name} ${route}: homepage hero actions are clipped below the viewport`);
+
+          await page.locator('.alpha-action-rail > a').first().click();
+          await page.waitForTimeout(100);
+          const phoneDirectoryState = await page.evaluate(() => {
+            const target = document.querySelector('#company-locations');
+            const rect = target?.getBoundingClientRect();
+            const phoneRects = [...document.querySelectorAll('table.locations .phone-link')]
+              .map((link) => link.getBoundingClientRect());
+            return {
+              hash: location.hash,
+              scrolled: window.scrollY > 0,
+              targetVisible: Boolean(rect && rect.top >= 0 && rect.top < window.innerHeight),
+              phoneVisible: phoneRects.some((phoneRect) => phoneRect.top >= 0 && phoneRect.top < window.innerHeight),
+              targetFocused: document.activeElement === target,
+            };
+          });
+          if (phoneDirectoryState.hash !== '#company-locations' || !phoneDirectoryState.scrolled || !phoneDirectoryState.targetVisible || !phoneDirectoryState.phoneVisible || !phoneDirectoryState.targetFocused) failures.push(`${viewport.name} ${route}: action 01 did not scroll and focus the phone directory (${JSON.stringify(phoneDirectoryState)})`);
         }
 
         if (route === '/contact-us-alpha-analytical-laboratories-inc/') {
