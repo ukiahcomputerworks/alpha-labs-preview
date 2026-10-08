@@ -6,6 +6,7 @@ const manifest = JSON.parse(readFileSync(new URL('./mirror-manifest.json', impor
 const viewports = [
   { name: 'desktop', width: 1440, height: 1000 },
   { name: 'compact-desktop', width: 1440, height: 800 },
+  { name: 'scaled-desktop', width: 1200, height: 900 },
   { name: 'phone', width: 390, height: 844 },
 ];
 
