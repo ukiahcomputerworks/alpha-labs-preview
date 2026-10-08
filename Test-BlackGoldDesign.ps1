@@ -38,8 +38,8 @@ foreach ($item in $manifest) {
     if ($html -notmatch '<meta name="viewport" content="width=device-width, initial-scale=1"') {
         $failures.Add("Missing responsive viewport: $($item.Route)")
     }
-    if ($html -notmatch 'styles\.css\?v=68') {
-        $failures.Add("Missing Alpha After Dark design cache key v68: $($item.Route)")
+    if ($html -notmatch 'styles\.css\?v=69') {
+        $failures.Add("Missing Alpha After Dark design cache key v69: $($item.Route)")
     }
     if ($html -notmatch 'script\.js\?v=17') {
         $failures.Add("Missing Alpha After Dark behavior cache key v17: $($item.Route)")
@@ -145,7 +145,7 @@ foreach ($homeMarker in @('California&#8217;s quiet powerhouse for environmental
 if ($homeMarkup -match 'feedback-btn\.png' -or $homeMarkup -match 'is a premier California \(ELAP certifications') {
     $failures.Add('Superseded homepage copy or the obsolete feedback image remains.')
 }
-$homeHeadingRule = [regex]::Match($styles, 'body\.home \.entry-content > h1,[\s\S]*?body\.home \.entry-content > h2,\s*body\.page-id-49 \.entry-title,\s*body\.page-id-9 \.entry-title\s*\{(?<declarations>[^}]*)\}')
+$homeHeadingRule = [regex]::Match($styles, '\.entry-title,[\s\S]*?body\.home \.entry-content > h1,[\s\S]*?body\.home \.entry-content > h2,[\s\S]*?body\.page-id-49 \.entry-title\s*\{(?<declarations>[^}]*)\}')
 if (-not $homeHeadingRule.Success -or $homeHeadingRule.Groups['declarations'].Value -notmatch 'alpha-contact-link-shimmer' -or $homeHeadingRule.Groups['declarations'].Value -match 'font-size') {
     $failures.Add('Homepage headings must shimmer in metallic gold without changing their established sizes.')
 }

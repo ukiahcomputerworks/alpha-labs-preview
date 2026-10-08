@@ -17,8 +17,9 @@ if (-not $failures.Count) {
     $activeHtml = Get-Content -Raw -LiteralPath $activePath
     $stagedHtml = Get-Content -Raw -LiteralPath $stagedPath
 
-    if ($activeHtml -notmatch 'No openings are currently posted') { $failures.Add('Active Careers page no longer has the original no-openings state.') }
-    if ($activeHtml -match 'data-staged-template="lab-tech-careers"') { $failures.Add('Staged Careers content is already visible on the active route.') }
+    if ($activeHtml -notmatch 'data-staged-template="lab-tech-careers"' -or $activeHtml -notmatch 'Laboratory Technician') {
+        $failures.Add('Active Careers page is missing the published Laboratory Technician opening.')
+    }
 
     $requiredPatterns = @(
         'data-staged-template="lab-tech-careers"',
@@ -57,7 +58,7 @@ if ($failures.Count) {
 
 [pscustomobject]@{
     Status = 'PASS'
-    ActiveCareersUnchanged = $true
+    ActiveCareersPublished = $true
     StagedFormNonSubmitting = $true
     Mode = if ($BaseUrl) { 'published' } else { 'local' }
 }

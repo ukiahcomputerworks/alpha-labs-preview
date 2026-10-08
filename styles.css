@@ -32,11 +32,11 @@
   border-top-color: transparent;
   clip-path: polygon(0 0, calc(100% - 28px) 0, 100% 28px, 100% 100%, 28px 100%, 0 calc(100% - 28px));
   display: grid;
-  gap: clamp(1.25rem, 3vw, 2.5rem) clamp(1.5rem, 4vw, 3.75rem);
+  gap: clamp(1rem, 2vw, 1.5rem) clamp(1.5rem, 3vw, 2.75rem);
   grid-template-columns: minmax(280px, .78fr) minmax(410px, 1.22fr);
-  margin: 2rem 0 1.5rem;
+  margin: .75rem 0 1rem;
   overflow: visible;
-  padding: clamp(1.2rem, 3.5vw, 3.5rem);
+  padding: clamp(1.1rem, 2.4vw, 2.25rem);
   position: relative;
 }
 
@@ -92,7 +92,7 @@
   grid-column: 1 / -1;
   justify-self: center;
   max-width: 850px;
-  padding: clamp(1.1rem, 2.5vw, 1.8rem) clamp(2.4rem, 6vw, 5rem);
+  padding: clamp(1rem, 1.8vw, 1.4rem) clamp(2rem, 5vw, 4rem);
   text-align: center;
   width: 100%;
 }
@@ -430,9 +430,9 @@
   display: grid;
   column-gap: clamp(1.5rem, 4vw, 4rem);
   grid-template-columns: minmax(280px, .82fr) minmax(360px, 1.18fr);
-  margin: 2rem 0 1.5rem;
+  margin: .75rem 0 1rem;
   overflow: visible;
-  padding: clamp(1.1rem, 3.5vw, 3.5rem);
+  padding: clamp(1.1rem, 2.4vw, 2.25rem);
   position: relative;
   row-gap: 1.25rem;
 }
@@ -500,7 +500,7 @@
   grid-column: 1 / -1;
   justify-self: center;
   max-width: 720px;
-  padding: .85rem clamp(2.4rem, 6vw, 5rem);
+  padding: .75rem clamp(2rem, 5vw, 4rem);
   text-align: center;
   width: min(100%, 720px);
   z-index: 2;
@@ -1000,7 +1000,7 @@ hr, .wp-block-separator { border-color: var(--alpha-line) !important; }
   background: transparent !important;
   margin: 0 auto;
   max-width: 1360px;
-  padding: 30px clamp(14px, 3vw, 40px) 0;
+  padding: 18px clamp(14px, 3vw, 40px) 0;
 }
 .site-container::before {
   background: linear-gradient(90deg, transparent, var(--alpha-gold), transparent);
@@ -1109,7 +1109,7 @@ hr, .wp-block-separator { border-color: var(--alpha-line) !important; }
   background: transparent !important;
   margin: 0 auto !important;
   max-width: var(--alpha-max) !important;
-  padding: clamp(34px, 5vw, 72px) 0 !important;
+  padding: clamp(24px, 3vw, 42px) 0 !important;
 }
 .content-sidebar-wrap {
   align-items: start;
@@ -1126,9 +1126,9 @@ hr, .wp-block-separator { border-color: var(--alpha-line) !important; }
   border-radius: 0 !important;
   box-shadow: 18px 18px 0 rgba(0,0,0,.28), 0 28px 70px var(--alpha-shadow);
   clip-path: polygon(0 0, calc(100% - 20px) 0, 100% 20px, 100% 100%, 0 100%);
-  margin: 0 0 2rem !important;
+  margin: 0 0 1rem !important;
   overflow: hidden;
-  padding: clamp(24px, 5vw, 58px) !important;
+  padding: clamp(22px, 3.5vw, 42px) !important;
   position: relative;
 }
 .entry::before {
@@ -1142,8 +1142,8 @@ hr, .wp-block-separator { border-color: var(--alpha-line) !important; }
 }
 .entry-header {
   border-bottom: 1px solid var(--alpha-line);
-  margin: 0 0 2rem !important;
-  padding: 0 0 1.25rem;
+  margin: 0 0 1.15rem !important;
+  padding: 0 0 .9rem;
   position: relative;
 }
 .entry-header::after {
@@ -1161,6 +1161,7 @@ hr, .wp-block-separator { border-color: var(--alpha-line) !important; }
   transform: translateY(50%);
 }
 .entry-title { margin: 0 !important; }
+.entry-content > :first-child { margin-top: 0 !important; }
 /* This long service title stays on one line inside its own content column. */
 body.page-id-9 .entry-header { container-type: inline-size; }
 body.page-id-77 .entry-header { container-type: inline-size; }
@@ -1197,11 +1198,12 @@ body.page-id-9 .entry-title {
 }
 .entry-content, .entry-content p, .entry-content li,
 .textwidget, .widget p { color: var(--alpha-muted) !important; }
+.entry-content, .entry-content p, .entry-content li { color: #fff !important; }
 .entry-content > p:first-of-type { color: var(--alpha-ivory) !important; font-size: 1.05rem; }
 .entry-content strong, .entry-content b { color: var(--alpha-ivory); }
 .entry-content h2, .entry-content h3 {
   border-left: 3px solid var(--alpha-gold);
-  margin-top: 1.8em;
+  margin-top: 1.35em;
   padding-left: .72rem;
 }
 .entry-content img {
@@ -1218,17 +1220,15 @@ body.page-id-9 .entry-title {
 .entry-content ul, .entry-content ol { padding-left: 1.4rem; }
 .entry-content li::marker { color: var(--alpha-gold); }
 
-/* Homepage story: preserve title scale, add gold focus, improve reading comfort. */
+/* Shared page hierarchy: homepage-inspired metallic title emphasis with
+   named long-title sizing retained for technical program pages. */
+.entry-title,
 #alpha-location-room-title,
-body.page-id-21 .entry-title,
 body.page-id-21 .client-kit h2,
-body.page-id-32 .entry-title,
 body.page-id-32 .entry-content > h2,
-body:is(.page-id-77, .page-id-79, .page-id-112) .entry-title,
 body.home .entry-content > h1,
 body.home .entry-content > h2,
-body.page-id-49 .entry-title,
-body.page-id-9 .entry-title {
+body.page-id-49 .entry-title {
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   animation: alpha-contact-link-shimmer 5.8s ease-in-out infinite;
@@ -1246,13 +1246,11 @@ body.page-id-9 .entry-title {
   color: var(--alpha-gold-bright) !important;
 }
 @media (prefers-reduced-motion: reduce) {
+  .entry-title,
   #alpha-location-room-title,
-  body.page-id-21 .entry-title,
   body.page-id-21 .client-kit h2,
-  body.page-id-32 .entry-title,
   body.page-id-32 .entry-content > h2,
-  body.page-id-9 .entry-title,
-  body:is(.page-id-49, .page-id-77, .page-id-79, .page-id-112) .entry-title { animation: none; background-position: 50% center; }
+  body.page-id-49 .entry-title { animation: none; background-position: 50% center; }
 }
 body.page-id-32 .entry-content > p,
 body.page-id-32 .entry-content li,
@@ -1487,10 +1485,10 @@ table.locations .phone-link { border-bottom: 0; }
   border: 1px solid rgba(255, 210, 79, .34);
   box-shadow: 18px 22px 0 rgba(0, 0, 0, .28), 0 28px 80px rgba(0, 0, 0, .42);
   clip-path: polygon(0 0, calc(100% - 18px) 0, 100% 18px, 100% 100%, 18px 100%, 0 calc(100% - 18px));
-  margin: 2rem auto 4rem;
+  margin: 1rem auto 2rem;
   max-width: 1040px;
   overflow: hidden;
-  padding: clamp(1.5rem, 4vw, 3.75rem);
+  padding: clamp(1.25rem, 3vw, 2.5rem);
   position: relative;
 }
 .alpha-location-room::before {
@@ -1519,11 +1517,11 @@ table.locations .phone-link { border-bottom: 0; }
 }
 #alpha-location-room-title + .alpha-location-room__intro {
   color: #fff !important;
-  margin: 1rem 0 2.25rem;
+  margin: .75rem 0 1.5rem;
   max-width: 700px;
 }
 .alpha-contact-form-intro {
-  margin: 4rem auto 1.25rem;
+  margin: 2rem auto 1rem;
   max-width: 1040px;
 }
 .alpha-contact-form-intro p {
@@ -1930,7 +1928,7 @@ table.locations .phone-link { border-bottom: 0; }
 .site-footer p, .site-footer a { color: var(--alpha-muted) !important; }
 
 @media (max-width: 960px) {
-  .site-container { padding: 14px 0 0; }
+  .site-container { padding: 10px 0 0; }
   .site-header {
     background-position: 69% 56px, center top !important;
     background-size: 27.4% auto, calc(100% - 30px) auto !important;
@@ -1988,7 +1986,7 @@ table.locations .phone-link { border-bottom: 0; }
 @media (max-width: 600px) {
   body { font-size: 15px; }
   .site-header { background-position: 69% 48px, center top !important; }
-  .site-inner { padding-bottom: 42px !important; padding-top: 28px !important; }
+  .site-inner { padding-bottom: 28px !important; padding-top: 20px !important; }
   .entry {
     box-shadow: 8px 8px 0 rgba(0,0,0,.3);
     clip-path: none;

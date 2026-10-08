@@ -2,29 +2,35 @@
 
 ## Approved reference
 
-The current public site at `https://www.alpha-labs.com/` is the sole baseline reference. The staged release preserves its WordPress Genesis theme, header, navigation, slider, content/sidebar layouts, typography, colors, imagery, responsive rules and route structure rather than introducing a new visual system before the owner meeting.
+The owner-approved Alpha After Dark homepage is the primary visual reference. Retained pages use the same black field, metallic-gold emphasis, ivory and white copy, clipped panels, fine gold rules, condensed display typography, and compact vertical rhythm. The original public site remains the factual and route baseline, not the current visual reference.
 
 ## Shared component roles
 
 | Role | Reference treatment |
 | --- | --- |
-| Header | Current Alpha Labs header artwork and Client Data Access control |
-| Navigation | Current Genesis primary navigation and active-page behavior |
-| Primary and section titles | Current theme typography, weights, sizes and Alpha blue |
-| Body and word links | Current Source Sans Pro theme styles and states |
-| Cards/sidebar | Current widgets, borders, spacing and image treatments |
-| Slider | Current Soliloquy markup, imagery and behavior |
-| Footer and locations | Current live-site widgets, contact details and copyright |
+| Header | Compact Alpha wordmark, metallic Client Data Access control, black field and gold rule |
+| Navigation | Rajdhani uppercase labels; one gold active state; shared hover and focus treatment |
+| Primary page title | Rajdhani 700 uppercase, shared responsive scale, animated metallic-gold fill, static gold in reduced motion |
+| Long page title | Named page-specific size only when required to preserve approved one-line or two-line wording |
+| Section title | Rajdhani 700 with gold left rule; gold shimmer only for approved emphasis roles |
+| Body and word links | Inter, solid white body copy, 1.68 base line height, gold links with visible focus |
+| Cards and dossiers | Black or graphite field, paired gold border and glow, clipped or rounded geometry by component family |
+| Graphics | Preserved aspect ratio, deliberate crop, project-local assets where generated for the preview |
+| Footer and locations | Compact black footer; verified callable telephone and Street View destinations |
+| Vertical rhythm | Shared compact shell, entry, title-rule and first-content spacing; specialty components may vary internally but not at the page boundary |
 
 ## Route-by-component matrix
 
-Every route in `mirror-manifest.json` uses the public site's own shared header, navigation and footer markup. Page-specific content, sidebar presence and active navigation state are retained from the corresponding live route. The injected `styles.css` is one site-wide override layer for owner-requested meeting changes.
+Every retained route in `mirror-manifest.json` uses the shared header, navigation, page shell, metallic primary-title treatment, white body palette, focus states and footer. Services, Contact, Forms, Careers and Regulatory keep their approved specialized card systems, but their page-title scale, title rule, opening gap and outer padding use the shared system. Program-work pages retain named long-title variants. The homepage hero remains the reference rather than being forced into the standard entry-title shell.
 
 ## Responsive targets
 
-- Desktop acceptance: 1440 by 900 pixels.
+- Large desktop acceptance: 1920 by 1080 pixels.
+- Compact desktop acceptance: 1440 by 800 pixels.
+- Tablet acceptance: 768 by 1024 pixels.
 - Phone acceptance: 390 by 844 pixels.
-- No unintended horizontal overflow, broken visual assets, console errors, heading skips or unnamed controls.
+- No unintended horizontal overflow, broken visual assets, oversized empty transition bands, console errors, heading skips or unnamed controls.
+- `Test-VerticalRhythm.mjs` checks all 35 routes at all four viewport sizes for repeated empty-space regressions.
 
 ## Provenance
 

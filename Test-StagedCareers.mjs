@@ -64,9 +64,10 @@ try {
   const activeState = await activePage.evaluate(() => ({
     hasNoOpenings: document.body.innerText.includes('No openings are currently posted'),
     hasStagedMarker: Boolean(document.querySelector('[data-staged-template="lab-tech-careers"]')),
+    hasLabTechOpening: document.body.innerText.includes('Laboratory Technician'),
   }));
-  if (!activeState.hasNoOpenings || activeState.hasStagedMarker) throw new Error('Active Careers route has changed before its cue.');
-  results.push({ activeCareers: 'UNCHANGED' });
+  if (activeState.hasNoOpenings || !activeState.hasStagedMarker || !activeState.hasLabTechOpening) throw new Error('Active Careers route is missing the published Laboratory Technician opening.');
+  results.push({ activeCareers: 'LAB_TECH_OPENING_PUBLISHED' });
   await activePage.close();
 
   console.log(JSON.stringify({ status: 'PASS', stagedUrl, results }, null, 2));

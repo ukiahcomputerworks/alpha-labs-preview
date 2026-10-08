@@ -37,8 +37,8 @@ foreach ($viewpoint in $requiredViewpoints) {
 }
 
 $streetViewLinks = [regex]::Matches($siteHtml, '<a\b[^>]*class="[^"]*street-view-link[^"]*"[^>]*>')
-if ($streetViewLinks.Count -lt 20) {
-    $failures.Add("Expected at least 20 Street View link placements; found $($streetViewLinks.Count).")
+if ($streetViewLinks.Count -lt 14) {
+    $failures.Add("Expected at least 14 Street View link placements after the Company-to-Contact consolidation; found $($streetViewLinks.Count).")
 }
 foreach ($link in $streetViewLinks) {
     if ($link.Value -notmatch 'target="_blank"' -or $link.Value -notmatch 'rel="noopener noreferrer"') {

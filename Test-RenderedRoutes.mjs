@@ -51,6 +51,10 @@ try {
             titleFont: titleStyle?.fontFamily || null,
             titleWeight: titleStyle?.fontWeight || null,
             titleLineHeight: titleStyle?.lineHeight || null,
+            entryTitleMetallic: !document.querySelector('.entry-title') || Boolean(
+              titleStyle?.backgroundImage.includes('gradient')
+              && titleStyle?.webkitTextFillColor === 'rgba(0, 0, 0, 0)'
+            ),
             visibleStreetViewLabels: [...document.querySelectorAll('.street-view-link')]
               .filter((link) => link.textContent.trim().toLowerCase() === 'street view').length,
           };
@@ -59,6 +63,7 @@ try {
         if (!response || response.status() !== 200) failures.push(`${viewport.name} ${route}: HTTP ${response?.status() ?? 'none'}`);
         if (state.documentWidth > state.viewportWidth) failures.push(`${viewport.name} ${route}: horizontal overflow ${state.documentWidth}/${state.viewportWidth}`);
         if (state.localBrokenImages) failures.push(`${viewport.name} ${route}: ${state.localBrokenImages} broken local image(s)`);
+        if (!state.entryTitleMetallic) failures.push(`${viewport.name} ${route}: primary page title does not use the shared metallic-gold treatment`);
         const headerlessLandingTemplate = route === '/landing-page/' && !state.headerPresent;
         if (!state.headerLogoVisible && !headerlessLandingTemplate && route !== '/') failures.push(`${viewport.name} ${route}: header logo is not visible`);
         if (route === '/' && state.headerLogoVisible) failures.push(`${viewport.name} ${route}: redundant home header logo is visible`);
