@@ -4,9 +4,11 @@ import { chromium } from 'file:///C:/Users/Admin/.cache/codex-runtimes/codex-pri
 
 const baseUrl = (process.argv[2] || 'http://127.0.0.1:4174').replace(/\/$/, '');
 const index = JSON.parse(await readFile(new URL('./search-index.json', import.meta.url), 'utf8'));
+const documentIndex = JSON.parse(await readFile(new URL('./document-search-index.json', import.meta.url), 'utf8'));
 const manifest = JSON.parse(await readFile(new URL('./mirror-manifest.json', import.meta.url), 'utf8'));
 assert.equal(index.pageCount, manifest.length, 'every retained page is indexed');
 assert.equal(index.pages.length, manifest.length);
+assert.equal(documentIndex.documentCount, documentIndex.documents.length);
 assert.ok(Object.keys(index.terms).length > 1500, 'full word vocabulary is indexed');
 for (const term of ['watertrax', 'pretreatment', 'coliform', 'sediment', 'hazardous']) {
   assert.ok(index.terms[term]?.length, `key public term ${term} is indexed`);
@@ -41,7 +43,7 @@ try {
         input: rect('.alpha-site-search'),
         client: rect('#client-connect'),
         panel: rect('#alpha-site-search-results'),
-        href: document.querySelector('#alpha-site-search-results a').getAttribute('href'),
+        hrefs: [...document.querySelectorAll('#alpha-site-search-results a')].map((link) => link.getAttribute('href')),
         documentWidth: document.documentElement.scrollWidth,
         viewportWidth: document.documentElement.clientWidth,
       };
@@ -50,8 +52,8 @@ try {
     if (width === 320) assert.ok(state.input.right - state.input.left >= 105, 'search remains usable on small phones');
     assert.ok(state.panel.left >= -1 && state.panel.right <= width + 1, `results fit viewport at ${width}px: ${JSON.stringify(state.panel)}`);
     assert.ok(state.documentWidth <= state.viewportWidth + 1, `no horizontal scroll at ${width}px`);
-    assert.equal(new URL(state.href, `${baseUrl}/`).pathname, new URL('forms/', `${baseUrl}/`).pathname,
-      'coliform result links to indexed Forms page');
+    assert.ok(state.hrefs.some((href) => new URL(href, `${baseUrl}/`).pathname === new URL('forms/', `${baseUrl}/`).pathname),
+      'coliform results include the indexed Forms page');
     assert.deepEqual(errors, [], `no browser errors at ${width}px`);
     checks += 5;
     if (width === 390) {
@@ -63,7 +65,7 @@ try {
       await input.press('Escape');
       assert.equal(await input.getAttribute('aria-expanded'), 'false');
       await input.fill('zzzxqvnmnotfound');
-      await page.locator('#alpha-site-search-results .alpha-site-search__summary').getByText(/No pages match/).waitFor();
+      await page.locator('#alpha-site-search-results .alpha-site-search__summary').getByText(/No pages or documents match/).waitFor();
       checks += 4;
     }
     await page.close();
@@ -73,10 +75,32 @@ try {
   await page.goto(`${baseUrl}/services-listing/`, { waitUntil: 'networkidle' });
   await page.locator('#alpha-site-search-input').fill('watertrax');
   await page.locator('#alpha-site-search-results a').first().waitFor();
-  assert.equal(await page.locator('#alpha-site-search-results a').count(), 1);
-  assert.match(await page.locator('#alpha-site-search-results a').first().innerText(), /WaterTrax/i);
+  assert.ok(await page.locator('#alpha-site-search-results a').count() >= 1);
+  assert.match(await page.locator('#alpha-site-search-results').innerText(), /WaterTrax/i);
   checks += 2;
   await page.close();
+
+  const documentPage = await browser.newPage({ viewport: { width: 320, height: 760 } });
+  await documentPage.route('**/document-search-index.json', (route) => route.fulfill({
+    status: 200,
+    contentType: 'application/json',
+    body: JSON.stringify({
+      version: 1, documentCount: 1, targetCount: 1, failedCount: 0,
+      documents: [{ title: 'Synthetic OCR verification', href: 'https://www.alpha-labs.com/example.pdf',
+        kind: 'document', method: 'ocr', text: 'The xylobromate test is listed in this document.' }],
+      terms: { xylobromate: [[0, 1]] },
+    }),
+  }));
+  await documentPage.goto(`${baseUrl}/`, { waitUntil: 'domcontentloaded' });
+  await documentPage.locator('#alpha-site-search-input').fill('xylobromate');
+  const documentResult = documentPage.locator('#alpha-site-search-results a').first();
+  await documentResult.waitFor();
+  assert.match(await documentPage.locator('.alpha-site-search__summary').innerText(), /0 pages · 1 document/);
+  assert.equal(await documentResult.getAttribute('target'), '_blank');
+  assert.equal(await documentResult.getAttribute('rel'), 'noopener noreferrer');
+  assert.match(await documentResult.innerText(), /Synthetic OCR verification/);
+  checks += 4;
+  await documentPage.close();
 
   const routePage = await browser.newPage();
   for (const item of manifest) {

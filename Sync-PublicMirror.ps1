@@ -114,7 +114,7 @@ foreach ($url in $urls) {
     }, 'IgnoreCase')
 
     $depth = if ($uri.AbsolutePath -eq '/' -or $uri.AbsolutePath.EndsWith('.html')) { '' } else { '../' }
-    $injection = "<link rel=`"stylesheet`" href=`"${depth}styles.css?v=78`"><script src=`"${depth}script.js?v=20`" defer></script>"
+    $injection = "<link rel=`"stylesheet`" href=`"${depth}styles.css?v=78`"><script src=`"${depth}script.js?v=21`" defer></script>"
     $html = [regex]::Replace($html, '</head>', "$injection</head>", 'IgnoreCase')
     $html = [regex]::Replace($html, '<form(?<attrs>[^>]*)>', '<form${attrs} data-rescue-mirror="true" onsubmit="return false">', 'IgnoreCase')
 

@@ -31,7 +31,7 @@ foreach ($item in $manifest) {
     if ($html -notmatch 'styles\.css\?v=78') {
         $failures.Add("Missing meeting override stylesheet on $($item.Route)")
     }
-    if ($html -notmatch 'script\.js\?v=20') {
+    if ($html -notmatch 'script\.js\?v=21') {
         $failures.Add("Missing meeting behavior script on $($item.Route)")
     }
 

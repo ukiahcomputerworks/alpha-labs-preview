@@ -352,11 +352,25 @@ if (alphaHeaderTools) {
   sizePlaceholder();
 
   const loadIndex = () => {
-    indexPromise ||= fetch(new URL('search-index.json', alphaSiteRoot))
-      .then((response) => {
-        if (!response.ok) throw new Error(`Search index HTTP ${response.status}`);
-        return response.json();
+    const fetchIndex = async (name) => {
+      const response = await fetch(new URL(name, alphaSiteRoot));
+      if (!response.ok) throw new Error(`${name} HTTP ${response.status}`);
+      return response.json();
+    };
+    indexPromise ||= Promise.all([
+      fetchIndex('search-index.json'), fetchIndex('document-search-index.json'),
+    ]).then(([pageIndex, documentIndex]) => {
+      const offset = pageIndex.pages.length;
+      const terms = { ...pageIndex.terms };
+      Object.entries(documentIndex.terms).forEach(([word, postings]) => {
+        terms[word] = [...(terms[word] || []), ...postings.map(([id, count]) => [id + offset, count])];
       });
+      return {
+        pages: [...pageIndex.pages, ...documentIndex.documents.map((document) => ({ ...document, kind: 'document' }))],
+        terms,
+        failedDocuments: documentIndex.failedCount || 0,
+      };
+    });
     return indexPromise;
   };
 
@@ -437,22 +451,29 @@ if (alphaHeaderTools) {
     }
     if (input.value.trim() !== query) return;
     const matches = matchingPages(query, index);
+    const matchingDocuments = matches.filter(({ page }) => page.kind === 'document').length;
+    const matchingPagesCount = matches.length - matchingDocuments;
     results.replaceChildren();
     const summary = document.createElement('p');
     summary.className = 'alpha-site-search__summary';
     summary.textContent = matches.length
-      ? `${matches.length} matching ${matches.length === 1 ? 'page' : 'pages'} · Arrow keys to choose, Enter to open`
-      : `No pages match “${query}”. Try a shorter word or another test name.`;
+      ? `${matchingPagesCount} ${matchingPagesCount === 1 ? 'page' : 'pages'} · ${matchingDocuments} ${matchingDocuments === 1 ? 'document' : 'documents'} · Arrow keys to choose, Enter to open`
+      : `No pages or documents match “${query}”. Try a shorter word or another test name.`;
+    if (index.failedDocuments) summary.textContent += ` · ${index.failedDocuments} document ${index.failedDocuments === 1 ? 'source is' : 'sources are'} currently unavailable`;
     results.append(summary);
     matches.forEach(({ page }, position) => {
       const link = document.createElement('a');
       link.id = `alpha-site-search-option-${position}`;
       link.href = new URL(page.href, alphaSiteRoot).href;
+      if (new URL(link.href).origin !== alphaSiteRoot.origin) {
+        link.target = '_blank';
+        link.rel = 'noopener noreferrer';
+      }
       link.setAttribute('role', 'option');
       const title = document.createElement('strong');
       const detail = document.createElement('small');
       title.textContent = page.title;
-      detail.textContent = snippetFor(page, query);
+      detail.textContent = `${page.kind === 'document' ? `${page.method === 'ocr' ? 'OCR' : 'Document'}${page.stale ? ' · last successful index' : ''} · ` : ''}${snippetFor(page, query)}`;
       link.append(title, detail);
       results.append(link);
     });

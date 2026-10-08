@@ -1,0 +1,117 @@
+name: Refresh public document search
+
+on:
+  # Los Angeles time follows daylight saving automatically. Off-hours are
+  # 00/04/08/20 on weekdays; weekends also include 12/16.
+  schedule:
+    - cron: '17 9-17 * * 1-5'
+      timezone: America/Los_Angeles
+    - cron: '17 0,4,8,20 * * 1-5'
+      timezone: America/Los_Angeles
+    - cron: '17 0,4,8,12,16,20 * * 0,6'
+      timezone: America/Los_Angeles
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pages: write
+
+concurrency:
+  group: public-document-index
+  cancel-in-progress: false
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    timeout-minutes: 55
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install text extraction and OCR tools
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends poppler-utils tesseract-ocr tesseract-ocr-eng
+          python -m pip install --disable-pip-version-check 'pypdf>=5,<7' 'openpyxl>=3.1,<4' 'Pillow>=11,<13'
+      - name: Scan public source and refresh changed files
+        run: python scripts/refresh_document_index.py
+      - name: Validate the generated document index
+        run: node Test-DocumentIndex.mjs --require-documents
+      - name: Summarize coverage
+        run: |
+          python - <<'PY' >> "$GITHUB_STEP_SUMMARY"
+          import json
+          from pathlib import Path
+          data = json.loads(Path('document-search-index.json').read_text())
+          print('## Alpha Labs public document index')
+          print(f"Indexed: {data['documentCount']} / {data['targetCount']} linked files")
+          print(f"\nFile failures: {data['failedCount']}; source-page failures: {len(data['sourcePageFailures'])}")
+          for failure in data['failures'][:20]:
+              print(f"\n- {failure['url']}: {failure['reason']}")
+          PY
+      - name: Commit changed index and request a Pages build
+        id: publish
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPOSITORY: ${{ github.repository }}
+          DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
+        run: |
+          git add document-search-index.json
+          if git diff --cached --quiet; then
+            echo 'changed=false' >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          git config user.name 'Alpha Labs document index bot'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git commit -m 'Refresh public document search index'
+          git pull --rebase origin "$DEFAULT_BRANCH"
+          git push origin "HEAD:$DEFAULT_BRANCH"
+          echo 'changed=true' >> "$GITHUB_OUTPUT"
+          # GITHUB_TOKEN pushes do not trigger branch-sourced Pages builds.
+          gh api --method POST "repos/$REPOSITORY/pages/builds" >/dev/null
+      - name: Verify the exact published document index
+        if: steps.publish.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPOSITORY: ${{ github.repository }}
+        run: |
+          commit=$(git rev-parse HEAD)
+          for attempt in $(seq 1 40); do
+            build=$(gh api "repos/$REPOSITORY/pages/builds/latest" --jq '.commit + " " + .status')
+            if [ "$build" = "$commit built" ]; then
+              break
+            fi
+            if [ "$build" = "$commit errored" ]; then
+              echo "Pages build failed for $commit" >&2
+              exit 1
+            fi
+            sleep 10
+          done
+          if [ "$build" != "$commit built" ]; then
+            echo "Pages did not build the expected commit: $build" >&2
+            exit 1
+          fi
+          site=$(gh api "repos/$REPOSITORY/pages" --jq '.html_url')
+          python - "$site" <<'PY'
+          import hashlib
+          from pathlib import Path
+          import sys
+          import time
+          from urllib.request import urlopen
+          expected = hashlib.sha256(Path('document-search-index.json').read_bytes()).hexdigest()
+          url = sys.argv[1].rstrip('/') + '/document-search-index.json'
+          for attempt in range(20):
+              try:
+                  actual = hashlib.sha256(urlopen(url, timeout=20).read()).hexdigest()
+                  if actual == expected:
+                      print(f'Live document index matches {expected} at {url}')
+                      break
+              except Exception:
+                  pass
+              time.sleep(10)
+          else:
+              raise SystemExit('Live document index did not match the published commit')
+          PY

@@ -1,4 +1,4 @@
-# Alpha Labs 48-hour website rescue
+# Alpha Labs staged website
 
 Independent, route-for-route static mirror of the public Alpha Analytical Laboratories website for fast owner-directed changes during a meeting.
 
@@ -26,7 +26,7 @@ The prepared Careers replacement is stored at `meeting-staged/careers-lab-tech/i
 
 `Test-PublicMirror.ps1` verifies the complete 35-route inventory locally and can verify every published route after a GitHub Pages build.
 
-After a public page edit or mirror sync, run `node scripts/Build-SearchIndex.mjs` to refresh the site-search index, then `node Test-SiteSearch.mjs` to check search, keyboard interaction and responsive result placement. Search indexes words in the retained HTML pages and their visible document-link labels; it does not read the contents of linked PDFs or images.
+After a public page edit or mirror sync, run `node scripts/Build-SearchIndex.mjs` to refresh the 35-page text index, then `node Test-SiteSearch.mjs` to check search, keyboard interaction and responsive result placement. The separate document index extracts embedded PDF text, OCRs scanned PDF pages and the 12 service-sheet images, and reads linked spreadsheets. It is refreshed by the repository-owned scheduled workflow; see `DOCUMENT-SEARCH-MAINTENANCE.md` for coverage, timing, transfer, and failure handling.
 
 ## Boundaries
 

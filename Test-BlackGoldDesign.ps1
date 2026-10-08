@@ -41,7 +41,7 @@ foreach ($item in $manifest) {
     if ($html -notmatch 'styles\.css\?v=78') {
         $failures.Add("Missing Alpha After Dark design cache key v75: $($item.Route)")
     }
-    if ($html -notmatch 'script\.js\?v=20') {
+    if ($html -notmatch 'script\.js\?v=21') {
         $failures.Add("Missing Alpha After Dark behavior cache key v18: $($item.Route)")
     }
     $contactNavPosition = $html.IndexOf('id="menu-item-170"')
