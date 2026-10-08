@@ -47,6 +47,7 @@ try {
       };
     });
     assert.ok(state.input.right <= state.client.left + 1, `search precedes Client Data Access at ${width}px`);
+    if (width === 320) assert.ok(state.input.right - state.input.left >= 105, 'search remains usable on small phones');
     assert.ok(state.panel.left >= -1 && state.panel.right <= width + 1, `results fit viewport at ${width}px: ${JSON.stringify(state.panel)}`);
     assert.ok(state.documentWidth <= state.viewportWidth + 1, `no horizontal scroll at ${width}px`);
     assert.equal(new URL(state.href, `${baseUrl}/`).pathname, new URL('forms/', `${baseUrl}/`).pathname,

@@ -1628,6 +1628,10 @@ table.locations > tbody {
     width: calc(100vw - 24px);
   }
 }
+@media (max-width: 375px) {
+  .site-header .menu-toggle { padding-inline: .5rem !important; }
+  .site-header #client-connect a { letter-spacing: 0 !important; padding-inline: .32rem !important; }
+}
 
 .location-directory {
   display: flex;
