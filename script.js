@@ -324,3 +324,20 @@ document.querySelectorAll('[data-agency-vault]').forEach((vault) => {
     });
   });
 });
+
+// Stable per-route phases keep the original gold highlights from moving in lockstep.
+const goldGlintTargets = [
+  '.entry-title', '#alpha-location-room-title', '.client-kit h2',
+  '.entry-content > h2', '.entry-content > h3',
+  '.service-vault__poster h2 span:last-child',
+  '.alpha-after-dark h1 span', '.alpha-action-rail__number',
+  '.alpha-action-rail strong', '.phone-link', '.street-view-link',
+  '.service-tab', '#client-connect', '.alpha-after-dark__primary',
+  'button', '.button'
+].join(', ');
+const routeGlintSeed = [...location.pathname].reduce((seed, character) => seed + character.charCodeAt(0), 0);
+document.querySelectorAll(goldGlintTargets).forEach((element, index) => {
+  const phase = routeGlintSeed + index * 17;
+  element.style.setProperty('--alpha-glint-duration', `${(5.3 + (phase % 43) / 10).toFixed(1)}s`);
+  element.style.setProperty('--alpha-glint-delay', `${(-.8 - (phase % 57) / 10).toFixed(1)}s`);
+});

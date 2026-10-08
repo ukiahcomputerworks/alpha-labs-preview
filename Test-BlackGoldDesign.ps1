@@ -38,11 +38,11 @@ foreach ($item in $manifest) {
     if ($html -notmatch '<meta name="viewport" content="width=device-width, initial-scale=1"') {
         $failures.Add("Missing responsive viewport: $($item.Route)")
     }
-    if ($html -notmatch 'styles\.css\?v=74') {
-        $failures.Add("Missing Alpha After Dark design cache key v74: $($item.Route)")
+    if ($html -notmatch 'styles\.css\?v=75') {
+        $failures.Add("Missing Alpha After Dark design cache key v75: $($item.Route)")
     }
-    if ($html -notmatch 'script\.js\?v=17') {
-        $failures.Add("Missing Alpha After Dark behavior cache key v17: $($item.Route)")
+    if ($html -notmatch 'script\.js\?v=18') {
+        $failures.Add("Missing Alpha After Dark behavior cache key v18: $($item.Route)")
     }
     $contactNavPosition = $html.IndexOf('id="menu-item-170"')
     $regulatoryNavPosition = $html.IndexOf('id="menu-item-176"')
@@ -146,13 +146,13 @@ if ($homeMarkup -match 'feedback-btn\.png' -or $homeMarkup -match 'is a premier 
     $failures.Add('Superseded homepage copy or the obsolete feedback image remains.')
 }
 $homeHeadingRule = [regex]::Match($styles, '\.entry-title,[\s\S]*?body\.home \.entry-content > h1,[\s\S]*?body\.home \.entry-content > h2,[\s\S]*?body\.page-id-49 \.entry-title\s*\{(?<declarations>[^}]*)\}')
-if (-not $homeHeadingRule.Success -or $homeHeadingRule.Groups['declarations'].Value -notmatch 'alpha-contact-link-shimmer' -or $homeHeadingRule.Groups['declarations'].Value -match 'font-size') {
+if (-not $homeHeadingRule.Success -or $styles -notmatch '@keyframes alpha-gold-text-glint' -or $styles -notmatch 'background-image: var\(--alpha-gold-glint\), var\(--alpha-gold-material\)' -or $homeHeadingRule.Groups['declarations'].Value -match 'font-size') {
     $failures.Add('Homepage headings must shimmer in metallic gold without changing their established sizes.')
 }
 if ($styles -notmatch 'body\.home \.entry-content > p,[\s\S]*?body\.home \.entry-content li\s*\{[^}]*color:\s*#fff\s*!important;[^}]*font-size:\s*1\.125rem\s*!important;') {
     $failures.Add('Homepage body copy is missing its larger solid-white reading treatment.')
 }
-if ($styles -notmatch '\.alpha-action-rail__number,[\s\S]*?\.alpha-action-rail strong\s*\{[^}]*alpha-contact-link-shimmer[^}]*linear-gradient') {
+if ($styles -notmatch '\.alpha-action-rail__number,[\s\S]*?\.alpha-action-rail strong\s*\{[^}]*alpha-contact-link-shimmer[^}]*linear-gradient' -or $styles -notmatch '\.alpha-action-rail strong\s*\{[^}]*alpha-gold-text-glint') {
     $failures.Add('Homepage action numbers and prompts are missing their metallic-gold shimmer treatment.')
 }
 if ($styles -notmatch '\.alpha-action-rail small\s*\{[^}]*color:\s*#fff\s*!important;[^}]*font-size:\s*\.82rem;') {

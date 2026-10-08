@@ -152,7 +152,7 @@ try {
             referenceH1.remove();
             referenceH2.remove();
             return {
-              heroTitleMarkup: hero?.querySelector('h1')?.innerHTML || '',
+              heroTitleMarkup: hero?.querySelector('h1')?.innerHTML.replace(/\sstyle="[^"]*"/g, '') || '',
               storyText: document.querySelector('.entry-content')?.textContent.replace(/\s+/g, ' ').trim() || '',
               ctaHref: cta?.href || '',
               ctaIsGold: Boolean(ctaStyle && ctaStyle.backgroundImage.includes('gradient')),
@@ -285,7 +285,7 @@ try {
             return {
               title: titleElement?.textContent.trim(),
               titleFitsOneLine: Boolean(titleElement && titleStyle && titleElement.scrollWidth <= titleElement.clientWidth + 1 && titleElement.clientHeight <= parseFloat(titleStyle.lineHeight) + 2 && titleStyle.whiteSpace === 'nowrap'),
-              titleShimmersGold: Boolean(titleStyle && titleStyle.backgroundClip === 'text' && titleStyle.animationName.includes('alpha-contact-link-shimmer')),
+              titleShimmersGold: Boolean(titleStyle && titleStyle.backgroundClip.split(',').every((clip) => clip.trim() === 'text') && titleStyle.animationName.includes('alpha-gold-text-glint')),
               tabCount: tabs.length,
               panelCount: panels.length,
               activeTarget: activeTab?.dataset.serviceTarget,

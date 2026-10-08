@@ -2078,6 +2078,10 @@ table.locations > tbody {
     #f7c944 84%,
     #7a4307 100%
   );
+  --alpha-gold-glint: linear-gradient(105deg,
+    transparent 36%, rgba(255, 241, 173, .12) 43%,
+    rgba(255, 241, 173, .82) 49%, rgba(255, 210, 79, .22) 55%,
+    transparent 64%);
 }
 
 body {
@@ -3038,3 +3042,64 @@ input[type="submit"],
   .kit-closing { align-items: stretch; flex-direction: column; } .kit-closing h2 { font-size: 1.7rem !important; }
 }
 @media(prefers-reduced-motion:reduce) { .kit-folder__body { animation:none; } .kit-routes a,.kit-folder__toggle { transition:none; } }
+
+/* One gold material everywhere a display headline glistens. The second layer
+   is a brief specular pass; the bronze/amber/champagne base remains visible. */
+.entry-title,
+#alpha-location-room-title,
+body.page-id-21 .client-kit h2,
+body.page-id-32 .entry-content > h2,
+body.home .entry-content > h1,
+body.home .entry-content > h2,
+.entry-content > h2,
+.entry-content > h3,
+.service-vault__poster h2 span:last-child,
+.alpha-after-dark h1 span,
+.alpha-action-rail__number,
+.alpha-action-rail strong {
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: alpha-gold-text-glint var(--alpha-glint-duration, 6.7s) cubic-bezier(.45, 0, .35, 1) var(--alpha-glint-delay, -1.8s) infinite;
+  background-clip: text;
+  background-image: var(--alpha-gold-glint), var(--alpha-gold-material);
+  background-position: 115% center, center;
+  background-size: 240% 100%, 100% 100%;
+  color: var(--alpha-24k) !important;
+}
+
+@keyframes alpha-gold-text-glint {
+  0%, 55% { background-position: 115% center, center; }
+  76%, 100% { background-position: -15% center, center; }
+}
+
+.phone-link,
+.street-view-link,
+.street-view-link > span,
+.service-tab::before,
+#client-connect::after,
+.alpha-after-dark__primary::after,
+button::after,
+.button::after {
+  animation-duration: var(--alpha-glint-duration, 6.7s);
+  animation-delay: var(--alpha-glint-delay, -1.8s);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .entry-title,
+  #alpha-location-room-title,
+  body.page-id-21 .client-kit h2,
+  body.page-id-32 .entry-content > h2,
+  body.home .entry-content > h1,
+  body.home .entry-content > h2,
+  .entry-content > h2,
+  .entry-content > h3,
+  .service-vault__poster h2 span:last-child,
+  .alpha-after-dark h1 span,
+  .alpha-action-rail__number,
+  .alpha-action-rail strong {
+    animation: none;
+    background-image: var(--alpha-gold-material);
+    background-position: center;
+    background-size: 100% 100%;
+  }
+}

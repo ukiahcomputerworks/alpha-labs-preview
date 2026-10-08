@@ -26,6 +26,7 @@ try {
   await referencePage.goto(`${baseUrl}/`, { waitUntil: 'networkidle' });
   const reference = await referencePage.evaluate(() => {
     const heading = document.querySelector('.alpha-after-dark h1');
+    const gold = document.querySelector('.alpha-after-dark h1 span');
     const summary = document.querySelector('.alpha-after-dark__summary');
     const headingStyle = heading && getComputedStyle(heading);
     const summaryStyle = summary && getComputedStyle(summary);
@@ -34,6 +35,9 @@ try {
       headingWeight: headingStyle?.fontWeight,
       bodyFamily: summaryStyle?.fontFamily,
       bodyColor: summaryStyle?.color,
+      goldMaterial: getComputedStyle(gold).backgroundImage,
+      goldDuration: getComputedStyle(gold).animationDuration,
+      goldDelay: getComputedStyle(gold).animationDelay,
     };
   });
   await referencePage.close();
@@ -81,6 +85,9 @@ try {
           titleSize: titleStyle?.fontSize,
           titleLineHeight: titleStyle?.lineHeight,
           titleAnimation: titleStyle?.animationName,
+          titleBackground: titleStyle?.backgroundImage,
+          titleDuration: titleStyle?.animationDuration,
+          titleDelay: titleStyle?.animationDelay,
           titleBackgroundClip: titleStyle?.backgroundClip,
           bodyFamily: bodyStyle?.fontFamily,
           bodyColor: bodyStyle?.color,
@@ -98,7 +105,8 @@ try {
       const fills = (outer, inner) => outer && inner && Math.abs(outer.left - inner.left) <= tolerance && Math.abs(outer.right - inner.right) <= tolerance;
       if (!fills(state.wrap, state.content) || !fills(state.content, state.entry)) failures.push(`${viewport.name} ${route.name}: primary content does not fill the shared page shell`);
       if (!state.titleFamily?.includes('Rajdhani') || state.titleWeight !== '700') failures.push(`${viewport.name} ${route.name}: page title typography diverges from the homepage display role`);
-      if (!state.titleAnimation?.includes('alpha-contact-link-shimmer') || state.titleBackgroundClip !== 'text') failures.push(`${viewport.name} ${route.name}: page title is missing the approved metallic-gold treatment`);
+      if (!state.titleAnimation?.includes('alpha-gold-text-glint') || !state.titleBackgroundClip?.split(',').every((clip) => clip.trim() === 'text') || state.titleBackground !== reference.goldMaterial) failures.push(`${viewport.name} ${route.name}: page title is missing the homepage gold material and glint`);
+      if (state.titleDuration === reference.goldDuration && state.titleDelay === reference.goldDelay) failures.push(`${viewport.name} ${route.name}: page title glint is synchronized with the homepage`);
       if (state.bodyFamily !== reference.bodyFamily || state.bodyColor !== 'rgb(255, 255, 255)') failures.push(`${viewport.name} ${route.name}: body typography diverges from the approved white inner-page body role`);
       if (state.entryBorder !== '1px' || state.entryAccentHeight !== '3px') failures.push(`${viewport.name} ${route.name}: shared page frame is incomplete`);
       if (viewport.name === 'desktop' && state.headerLabelDisplay === 'none') failures.push(`${viewport.name} ${route.name}: shared analytical-system header label is missing`);
@@ -116,6 +124,8 @@ try {
         titleTop: Math.round(state.title.top),
         titleSize: state.titleSize,
         titleLineHeight: state.titleLineHeight,
+        goldDuration: state.titleDuration,
+        goldDelay: state.titleDelay,
         contentGap: Math.round((state.firstContent.top - state.header.bottom) * 10) / 10,
         overflow: state.horizontalOverflow,
       });
