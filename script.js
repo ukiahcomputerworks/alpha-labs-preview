@@ -82,15 +82,62 @@ if (homeSlider && !homeSlider.querySelector('.alpha-after-dark')) {
   homeSlider.insertAdjacentElement('afterend', actionRail);
 }
 
+// The selected mark travels above both clipped page frames before the dossier lights up.
+const transferMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+const transferPulseTimers = new WeakMap();
+const pulseTransferDestination = (destination) => {
+  if (!destination || transferMotion.matches) return;
+  window.clearTimeout(transferPulseTimers.get(destination));
+  destination.classList.remove('is-receiving');
+  void destination.offsetWidth;
+  destination.classList.add('is-receiving');
+  transferPulseTimers.set(destination, window.setTimeout(() => destination.classList.remove('is-receiving'), 700));
+};
+const sendGoldStar = (source, destination) => {
+  if (!source || !destination || transferMotion.matches) return Promise.resolve();
+  document.querySelectorAll('.alpha-transfer-star').forEach((star) => {
+    star.getAnimations().forEach((animation) => animation.cancel());
+    star.remove();
+  });
+
+  const origin = source.getBoundingClientRect();
+  const target = destination.getBoundingClientRect();
+  const startX = origin.left + origin.width / 2;
+  const startY = origin.top + origin.height / 2;
+  const stacked = target.top >= origin.bottom && target.left < origin.right;
+  const endX = stacked ? target.left + target.width / 2 : target.left + Math.min(48, target.width * .12);
+  const actualEndY = stacked ? target.top + 28 : target.top + Math.min(target.height * .32, 165);
+  const endY = Math.max(30, Math.min(window.innerHeight - 30, actualEndY));
+  const distance = Math.hypot(endX - startX, endY - startY);
+  if (distance < 24) return Promise.resolve();
+  const angle = Math.atan2(endY - startY, endX - startX) * 180 / Math.PI;
+  const position = (x, y, scale) => `translate(${x}px, ${y}px) rotate(${angle}deg) scale(${scale})`;
+  const star = document.createElement('span');
+  star.className = 'alpha-transfer-star';
+  star.setAttribute('aria-hidden', 'true');
+  star.style.setProperty('--alpha-star-tail', `${Math.min(145, Math.max(60, distance * .35))}px`);
+  document.body.append(star);
+  const flight = star.animate([
+    { opacity: 0, transform: position(startX, startY, .55), offset: 0 },
+    { opacity: 1, transform: position(startX + (endX - startX) * .1, startY + (endY - startY) * .1, 1), offset: .12 },
+    { opacity: 1, transform: position(endX, endY, 1), offset: .78 },
+    { opacity: 0, transform: position(endX, endY, 1.7), offset: 1 }
+  ], { duration: 520, easing: 'cubic-bezier(.19, .74, .24, 1)', fill: 'forwards' });
+  return flight.finished.catch(() => {}).finally(() => star.remove());
+};
+
 const locationRoom = document.querySelector('.alpha-location-room');
 
 if (locationRoom) {
   const locationButtons = [...locationRoom.querySelectorAll('[data-location]')];
   const locationPanels = [...locationRoom.querySelectorAll('[data-location-panel]')];
   const locationPlaceholder = locationRoom.querySelector('[data-location-placeholder]');
+  const locationIntelligence = locationRoom.querySelector('.location-intelligence');
+  let selectionSequence = 0;
 
   locationButtons.forEach((button) => {
     button.addEventListener('click', () => {
+      const sequence = ++selectionSequence;
       const selectedLocation = button.dataset.location;
 
       locationButtons.forEach((candidate) => {
@@ -106,6 +153,14 @@ if (locationRoom) {
       if (locationPlaceholder) {
         locationPlaceholder.hidden = true;
       }
+
+      sendGoldStar(button.querySelector('.alpha-map-pin__dot') || button, locationIntelligence).then(() => {
+        if (sequence !== selectionSequence) return;
+        pulseTransferDestination(locationIntelligence);
+        if (window.matchMedia('(max-width: 782px)').matches) {
+          locationIntelligence.scrollIntoView({ behavior: 'instant', block: 'start' });
+        }
+      });
     });
   });
 }
@@ -211,90 +266,17 @@ document.querySelectorAll('[data-agency-vault]').forEach((vault) => {
     agencyPanels.forEach((panel) => {
       panel.hidden = panel.dataset.agencyPanel !== selectedAgency;
     });
-
-    if (placeholder) {
-      placeholder.hidden = true;
-    }
-
-    if (intelligenceCard) {
-      intelligenceCard.classList.remove('is-receiving');
-      void intelligenceCard.offsetWidth;
-      intelligenceCard.classList.add('is-receiving');
-      window.setTimeout(() => intelligenceCard.classList.remove('is-receiving'), 620);
-
-      if (window.matchMedia('(max-width: 900px)').matches) {
-        window.setTimeout(() => {
-          intelligenceCard.scrollIntoView({
-            behavior: reducedMotion.matches ? 'auto' : 'smooth',
-            block: 'start'
-          });
-        }, reducedMotion.matches ? 0 : 80);
-      }
-    }
+    if (placeholder) placeholder.hidden = true;
   };
 
   const transmitAgencyMark = (button, sequence) => {
-    if (!intelligenceCard || reducedMotion.matches) {
-      releasePanel(button.dataset.agencyTarget);
-      return;
-    }
-
-    vault.querySelectorAll('.agency-signal, .agency-transfer-mark').forEach((element) => element.remove());
-
-    const vaultRect = vault.getBoundingClientRect();
-    const logoPlate = button.querySelector('.agency-tab__logo-plate');
-    const logo = logoPlate && logoPlate.querySelector('img');
-    const sourceRect = (logoPlate || button).getBoundingClientRect();
-    const cardRect = intelligenceCard.getBoundingClientRect();
-    const horizontalLayout = cardRect.left > sourceRect.right;
-    const startX = horizontalLayout ? sourceRect.right - vaultRect.left : sourceRect.left + (sourceRect.width / 2) - vaultRect.left;
-    const startY = horizontalLayout ? sourceRect.top + (sourceRect.height / 2) - vaultRect.top : sourceRect.bottom - vaultRect.top;
-    const endX = horizontalLayout ? cardRect.left - vaultRect.left + 18 : cardRect.left + (cardRect.width / 2) - vaultRect.left;
-    const endY = horizontalLayout ? cardRect.top + Math.min(cardRect.height * .32, 220) - vaultRect.top : cardRect.top - vaultRect.top + 22;
-    const deltaX = endX - startX;
-    const deltaY = endY - startY;
-    const length = Math.hypot(deltaX, deltaY);
-    const angle = Math.atan2(deltaY, deltaX) * (180 / Math.PI);
-
-    const signal = document.createElement('span');
-    signal.className = 'agency-signal';
-    signal.setAttribute('aria-hidden', 'true');
-    signal.style.setProperty('--signal-x', `${startX}px`);
-    signal.style.setProperty('--signal-y', `${startY}px`);
-    signal.style.setProperty('--signal-length', `${length}px`);
-    signal.style.setProperty('--signal-angle', `${angle}deg`);
-    vault.append(signal);
-    requestAnimationFrame(() => signal.classList.add('is-travelling'));
-
-    if (logo) {
-      const transfer = document.createElement('span');
-      transfer.className = 'agency-transfer-mark';
-      transfer.setAttribute('aria-hidden', 'true');
-      transfer.style.setProperty('--transfer-x', `${sourceRect.left - vaultRect.left}px`);
-      transfer.style.setProperty('--transfer-y', `${sourceRect.top - vaultRect.top}px`);
-      transfer.style.setProperty('--transfer-width', `${sourceRect.width}px`);
-      transfer.style.setProperty('--transfer-height', `${sourceRect.height}px`);
-      transfer.append(logo.cloneNode(true));
-      vault.append(transfer);
-
-      transfer.animate([
-        { opacity: 0, transform: 'translate(0, 0) scale(.82)' },
-        { opacity: 1, offset: .18, transform: 'translate(0, 0) scale(1)' },
-        { opacity: 1, offset: .7, transform: `translate(${deltaX}px, ${deltaY}px) scale(.72)` },
-        { opacity: 0, transform: `translate(${deltaX}px, ${deltaY}px) scale(.46)` }
-      ], { duration: 500, easing: 'cubic-bezier(.2, .76, .24, 1)', fill: 'forwards' });
-    }
-
-    window.setTimeout(() => {
-      if (sequence === selectionSequence) {
-        releasePanel(button.dataset.agencyTarget);
+    sendGoldStar(button.querySelector('.agency-tab__logo-plate') || button, intelligenceCard).then(() => {
+      if (sequence !== selectionSequence) return;
+      pulseTransferDestination(intelligenceCard);
+      if (window.matchMedia('(max-width: 900px)').matches) {
+        intelligenceCard.scrollIntoView({ behavior: 'instant', block: 'start' });
       }
-    }, 350);
-
-    window.setTimeout(() => {
-      signal.remove();
-      vault.querySelectorAll('.agency-transfer-mark').forEach((element) => element.remove());
-    }, 560);
+    });
   };
 
   agencyButtons.forEach((button) => {
@@ -307,13 +289,7 @@ document.querySelectorAll('[data-agency-vault]').forEach((vault) => {
         candidate.setAttribute('aria-expanded', String(isSelected));
       });
 
-      agencyPanels.forEach((panel) => {
-        panel.hidden = true;
-      });
-
-      if (placeholder) {
-        placeholder.hidden = true;
-      }
+      releasePanel(button.dataset.agencyTarget);
 
       const activeSequence = selectionSequence;
       centerDesktopDossier().then(() => {

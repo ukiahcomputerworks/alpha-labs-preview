@@ -9,13 +9,14 @@ The owner-approved Alpha After Dark homepage is the primary visual reference. Re
 | Role | Reference treatment |
 | --- | --- |
 | Header | Compact Alpha wordmark, gold-edged site search beside metallic Client Data Access, black field and gold rule |
-| Site search | Searchable word index of all 35 retained HTML pages; gold/black results panel, exact and prefix word matches, multi-word intersection, keyboard navigation and announced results |
+| Site search | Searchable word index of all 35 retained HTML pages; one-pixel slanted gold frame with an independent outline glint and no icon/input divider; exact and prefix word matches, multi-word intersection, keyboard navigation and announced results |
 | Navigation | Rajdhani uppercase labels; one gold active state; shared hover and focus treatment |
-| Primary page title | Rajdhani 700 uppercase, shared responsive scale, animated metallic-gold fill, static gold in reduced motion |
+| Primary page title | Rajdhani 700 uppercase, shared responsive scale, visibly sweeping champagne-white glint over the retained rich metallic-gold fill at staggered intervals, static gold in reduced motion |
 | Long page title | Named page-specific size only when required to preserve approved one-line or two-line wording |
 | Section title | Rajdhani 700 with gold left rule; gold shimmer only for approved emphasis roles |
 | Body and word links | Inter, solid white body copy, 1.68 base line height, gold links with visible focus |
 | Cards and dossiers | Black or graphite field, paired gold border and glow, clipped or rounded geometry by component family |
+| Selector-to-dossier feedback | Regulatory agency marks and Contact map pins send the same white-gold shooting star to the selected detail card, followed by a brief gold border pulse; stacked phone layouts bring the detail into view after the flight, while reduced-motion users see the details immediately without travel |
 | Graphics | Preserved aspect ratio, deliberate crop, project-local assets where generated for the preview |
 | Footer and locations | Compact black footer; verified callable telephone and Street View destinations |
 | Vertical rhythm | Shared compact shell, entry, title-rule and first-content spacing; specialty components may vary internally but not at the page boundary |
@@ -33,6 +34,8 @@ Every retained route in `mirror-manifest.json` is indexed. The 34 routes with Cl
 - Search utility acceptance also covers 600 and 320 pixel widths, keeping its results panel fully inside the viewport; the smallest phones use a shorter visual placeholder with the full accessible label intact.
 - No unintended horizontal overflow, broken visual assets, oversized empty transition bands, console errors, heading skips or unnamed controls.
 - `Test-VerticalRhythm.mjs` checks all 35 routes at all four viewport sizes for repeated empty-space regressions.
+- `Test-SelectionStar.mjs` checks both selection-to-dossier transitions at desktop and narrow phone widths, plus reduced-motion behavior.
+- `Test-GoldMotion.mjs` verifies staggered looping headline glints, a visible rendered sweep, the search frame at 1440/390/320 pixels, and static reduced-motion fallback.
 
 ## Provenance
 
