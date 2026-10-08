@@ -38,8 +38,8 @@ foreach ($item in $manifest) {
     if ($html -notmatch '<meta name="viewport" content="width=device-width, initial-scale=1"') {
         $failures.Add("Missing responsive viewport: $($item.Route)")
     }
-    if ($html -notmatch 'styles\.css\?v=67') {
-        $failures.Add("Missing Alpha After Dark design cache key v67: $($item.Route)")
+    if ($html -notmatch 'styles\.css\?v=68') {
+        $failures.Add("Missing Alpha After Dark design cache key v68: $($item.Route)")
     }
     if ($html -notmatch 'script\.js\?v=17') {
         $failures.Add("Missing Alpha After Dark behavior cache key v17: $($item.Route)")
@@ -99,8 +99,16 @@ if ($services -notmatch 'mailto:robbie@alpha-labs\.com' -or $services -notmatch 
 if ($services -notmatch 'data-service-vault' -or @([regex]::Matches($services, 'data-service-target=')).Count -ne 2 -or @([regex]::Matches($services, 'data-service-panel=')).Count -ne 2) {
     $failures.Add('The two-program Services selector or its paired testing dossiers are incomplete.')
 }
+foreach ($serviceImage in @('drinking-water-card.png', 'wastewater-card.png')) {
+    if ($services -notmatch [regex]::Escape("assets/services/$serviceImage") -or -not (Test-Path -LiteralPath (Join-Path $root "assets\services\$serviceImage") -PathType Leaf)) {
+        $failures.Add("Missing photographic Services selector asset: $serviceImage")
+    }
+}
 if ($styles -notmatch '\.service-vault\s*\{' -or $styles -notmatch 'grid-template-columns:\s*minmax\(280px, \.78fr\) minmax\(410px, 1\.22fr\)' -or $script -notmatch 'selectService') {
     $failures.Add('The stacked-left Services selector, right-hand dossier, or accessible switching behavior is missing.')
+}
+if ($styles -notmatch '@keyframes service-outline-shimmer' -or $styles -notmatch '\.service-tab:nth-child\(2\)::before\s*\{[^}]*animation-delay:\s*-3\.7s') {
+    $failures.Add('The two photographic Services cards are missing their independently timed gold outline shimmer.')
 }
 
 $regulatory = Get-Content -Raw -LiteralPath (Join-Path $root 'regulatory\index.html')
