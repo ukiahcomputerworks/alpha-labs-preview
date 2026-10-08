@@ -20,7 +20,7 @@ The workflow `refresh-document-index.yml` runs in `America/Los_Angeles` at 17 mi
 - Other weekday hours: midnight, 4:00 AM, 8:00 AM, and 8:00 PM.
 - Weekends: midnight, 4:00 AM, 8:00 AM, noon, 4:00 PM, and 8:00 PM.
 
-It uses conditional HTTP requests (`ETag` / `Last-Modified`) and re-extracts only new or changed files. If the source supplies neither validator, the file is downloaded and content-hashed. A new commit and Pages build are requested only when the document index changes. GitHub scheduled runs are best-effort and can be delayed or dropped, so this is a check cadence, not a guaranteed one-hour freshness SLA. Workflow failures and per-file coverage appear in the Actions run summary.
+It uses conditional HTTP requests (`ETag` / `Last-Modified`) and re-extracts only new or changed files. If the source supplies neither validator, the file is downloaded and content-hashed. A new index commit and Pages build are requested only when document content or coverage changes. Because GitHub can disable schedules in inactive public repositories after 60 days, a no-content-change run makes one empty keepalive commit after 30 days without other commits; that commit also requests a Pages build of the unchanged site. GitHub scheduled runs are best-effort and can be delayed or dropped, so this is a check cadence, not a guaranteed one-hour freshness SLA. Workflow failures and per-file coverage appear in the Actions run summary.
 
 ## Run and verify
 

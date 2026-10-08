@@ -60,13 +60,22 @@ jobs:
           DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
         run: |
           git add document-search-index.json
-          if git diff --cached --quiet; then
-            echo 'changed=false' >> "$GITHUB_OUTPUT"
-            exit 0
-          fi
           git config user.name 'Alpha Labs document index bot'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git commit -m 'Refresh public document search index'
+          if git diff --cached --quiet; then
+            # Public-repository schedules may be disabled after 60 days of
+            # inactivity. One empty commit after 30 days keeps the schedule
+            # alive without changing the document text.
+            last_commit=$(git log -1 --format=%ct)
+            age=$(( $(date +%s) - last_commit ))
+            if [ "$age" -lt 2592000 ]; then
+              echo 'changed=false' >> "$GITHUB_OUTPUT"
+              exit 0
+            fi
+            git commit --allow-empty -m 'Keep public document refresh schedule active'
+          else
+            git commit -m 'Refresh public document search index'
+          fi
           git pull --rebase origin "$DEFAULT_BRANCH"
           git push origin "HEAD:$DEFAULT_BRANCH"
           echo 'changed=true' >> "$GITHUB_OUTPUT"
