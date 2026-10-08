@@ -28,10 +28,10 @@ foreach ($item in $manifest) {
     if ($html -notmatch '<meta name="robots" content="noindex, nofollow">') {
         $failures.Add("Missing noindex on $($item.Route)")
     }
-    if ($html -notmatch 'styles\.css\?v=75') {
+    if ($html -notmatch 'styles\.css\?v=76') {
         $failures.Add("Missing meeting override stylesheet on $($item.Route)")
     }
-    if ($html -notmatch 'script\.js\?v=18') {
+    if ($html -notmatch 'script\.js\?v=19') {
         $failures.Add("Missing meeting behavior script on $($item.Route)")
     }
 

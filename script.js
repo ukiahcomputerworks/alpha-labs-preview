@@ -341,3 +341,165 @@ document.querySelectorAll(goldGlintTargets).forEach((element, index) => {
   element.style.setProperty('--alpha-glint-duration', `${(5.3 + (phase % 43) / 10).toFixed(1)}s`);
   element.style.setProperty('--alpha-glint-delay', `${(-.8 - (phase % 57) / 10).toFixed(1)}s`);
 });
+
+// Search every retained page from a source-built, word-by-word index.
+const alphaHeaderTools = document.querySelector('.site-header .header-widget-area .custom-html-widget');
+if (alphaHeaderTools) {
+  const alphaSiteRoot = new URL('.', document.currentScript.src);
+  const search = document.createElement('form');
+  search.className = 'alpha-site-search';
+  search.setAttribute('role', 'search');
+  search.innerHTML = `
+    <label class="screen-reader-text" for="alpha-site-search-input">Search all Alpha Labs pages</label>
+    <span class="alpha-site-search__icon" aria-hidden="true">⌕</span>
+    <input id="alpha-site-search-input" type="search" placeholder="Search site" autocomplete="off"
+      role="combobox" aria-autocomplete="list" aria-haspopup="listbox"
+      aria-controls="alpha-site-search-results" aria-expanded="false">
+    <div class="alpha-site-search__results" id="alpha-site-search-results" role="listbox" hidden></div>
+    <span class="screen-reader-text" role="status" aria-live="polite" data-alpha-search-status></span>`;
+  alphaHeaderTools.prepend(search);
+
+  const input = search.querySelector('input');
+  const results = search.querySelector('.alpha-site-search__results');
+  const status = search.querySelector('[data-alpha-search-status]');
+  const words = (value) => value.normalize('NFKD').toLowerCase()
+    .replace(/\p{M}/gu, '').match(/[\p{L}\p{N}]+/gu) || [];
+  let indexPromise;
+  let active = -1;
+
+  const sizePlaceholder = () => {
+    input.placeholder = window.innerWidth <= 375 ? 'Search' : 'Search site';
+  };
+  const alignResults = () => {
+    search.style.setProperty('--alpha-search-left', `${search.getBoundingClientRect().left}px`);
+  };
+  sizePlaceholder();
+
+  const loadIndex = () => {
+    indexPromise ||= fetch(new URL('search-index.json', alphaSiteRoot))
+      .then((response) => {
+        if (!response.ok) throw new Error(`Search index HTTP ${response.status}`);
+        return response.json();
+      });
+    return indexPromise;
+  };
+
+  const close = () => {
+    results.hidden = true;
+    results.replaceChildren();
+    input.setAttribute('aria-expanded', 'false');
+    input.removeAttribute('aria-activedescendant');
+    active = -1;
+  };
+
+  const setActive = (next) => {
+    const options = [...results.querySelectorAll('[role="option"]')];
+    if (!options.length) return;
+    active = (next + options.length) % options.length;
+    options.forEach((option, position) => option.classList.toggle('is-active', position === active));
+    input.setAttribute('aria-activedescendant', options[active].id);
+    options[active].scrollIntoView({ block: 'nearest' });
+  };
+
+  const matchingPages = (query, index) => {
+    const tokens = [...new Set(words(query))];
+    if (!tokens.length) return [];
+    const vocabulary = Object.keys(index.terms);
+    const postings = tokens.map((token) => {
+      const exact = index.terms[token];
+      if (exact) return new Map(exact);
+      const expanded = vocabulary.filter((word) => word.startsWith(token)).slice(0, 80);
+      const matches = new Map();
+      expanded.forEach((word) => index.terms[word].forEach(([id, count]) =>
+        matches.set(id, (matches.get(id) || 0) + count)));
+      return matches;
+    });
+    if (postings.some((entry) => !entry.size)) return [];
+    const exactQuery = query.toLowerCase();
+    return [...postings[0].keys()]
+      .filter((id) => postings.every((entry) => entry.has(id)))
+      .map((id) => {
+        const page = index.pages[id];
+        const title = page.title.toLowerCase();
+        const score = (title === exactQuery ? 100 : title.startsWith(exactQuery) ? 65 : title.includes(exactQuery) ? 40 : 0)
+          + tokens.filter((token) => title.includes(token)).length * 12
+          + postings.reduce((sum, entry) => sum + Math.min(entry.get(id), 8), 0);
+        return { page, score };
+      })
+      .sort((a, b) => b.score - a.score || a.page.title.localeCompare(b.page.title));
+  };
+
+  const snippetFor = (page, query) => {
+    const text = page.text;
+    const lower = text.toLowerCase();
+    const first = words(query).map((word) => lower.indexOf(word)).find((position) => position >= 0) ?? 0;
+    const start = Math.max(0, first - 48);
+    const end = Math.min(text.length, first + 132);
+    return `${start ? '…' : ''}${text.slice(start, end).trim()}${end < text.length ? '…' : ''}`;
+  };
+
+  const render = async () => {
+    const query = input.value.trim();
+    if (query.length < 2) return close();
+    alignResults();
+    status.textContent = 'Searching Alpha Labs pages';
+    let index;
+    try {
+      index = await loadIndex();
+    } catch {
+      indexPromise = undefined;
+      if (input.value.trim() !== query) return;
+      results.replaceChildren();
+      const message = document.createElement('p');
+      message.className = 'alpha-site-search__empty';
+      message.textContent = 'Search is temporarily unavailable. Please try again.';
+      results.append(message);
+      results.hidden = false;
+      input.setAttribute('aria-expanded', 'true');
+      status.textContent = message.textContent;
+      return;
+    }
+    if (input.value.trim() !== query) return;
+    const matches = matchingPages(query, index);
+    results.replaceChildren();
+    const summary = document.createElement('p');
+    summary.className = 'alpha-site-search__summary';
+    summary.textContent = matches.length
+      ? `${matches.length} matching ${matches.length === 1 ? 'page' : 'pages'} · Arrow keys to choose, Enter to open`
+      : `No pages match “${query}”. Try a shorter word or another test name.`;
+    results.append(summary);
+    matches.forEach(({ page }, position) => {
+      const link = document.createElement('a');
+      link.id = `alpha-site-search-option-${position}`;
+      link.href = new URL(page.href, alphaSiteRoot).href;
+      link.setAttribute('role', 'option');
+      const title = document.createElement('strong');
+      const detail = document.createElement('small');
+      title.textContent = page.title;
+      detail.textContent = snippetFor(page, query);
+      link.append(title, detail);
+      results.append(link);
+    });
+    results.hidden = false;
+    input.setAttribute('aria-expanded', 'true');
+    input.removeAttribute('aria-activedescendant');
+    status.textContent = summary.textContent;
+    active = -1;
+  };
+
+  input.addEventListener('input', render);
+  input.addEventListener('focus', render);
+  input.addEventListener('keydown', (event) => {
+    const options = [...results.querySelectorAll('[role="option"]')];
+    if (event.key === 'ArrowDown' && options.length) { event.preventDefault(); setActive(active + 1); }
+    if (event.key === 'ArrowUp' && options.length) { event.preventDefault(); setActive(active - 1); }
+    if (event.key === 'Escape') { event.preventDefault(); close(); }
+    if (event.key === 'Enter' && options.length) {
+      event.preventDefault();
+      options[active < 0 ? 0 : active].click();
+    }
+  });
+  search.addEventListener('submit', (event) => event.preventDefault());
+  window.addEventListener('resize', () => { sizePlaceholder(); alignResults(); });
+  document.addEventListener('click', (event) => { if (!search.contains(event.target)) close(); });
+}

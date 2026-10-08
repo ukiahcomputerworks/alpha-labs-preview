@@ -26,6 +26,8 @@ The prepared Careers replacement is stored at `meeting-staged/careers-lab-tech/i
 
 `Test-PublicMirror.ps1` verifies the complete 35-route inventory locally and can verify every published route after a GitHub Pages build.
 
+After a public page edit or mirror sync, run `node scripts/Build-SearchIndex.mjs` to refresh the site-search index, then `node Test-SiteSearch.mjs` to check search, keyboard interaction and responsive result placement. Search indexes words in the retained HTML pages and their visible document-link labels; it does not read the contents of linked PDFs or images.
+
 ## Boundaries
 
 - The staged site contains only current public Alpha Labs material.
