@@ -38,8 +38,8 @@ foreach ($item in $manifest) {
     if ($html -notmatch '<meta name="viewport" content="width=device-width, initial-scale=1"') {
         $failures.Add("Missing responsive viewport: $($item.Route)")
     }
-    if ($html -notmatch 'styles\.css\?v=73') {
-        $failures.Add("Missing Alpha After Dark design cache key v73: $($item.Route)")
+    if ($html -notmatch 'styles\.css\?v=74') {
+        $failures.Add("Missing Alpha After Dark design cache key v74: $($item.Route)")
     }
     if ($html -notmatch 'script\.js\?v=17') {
         $failures.Add("Missing Alpha After Dark behavior cache key v17: $($item.Route)")
@@ -118,8 +118,8 @@ if ($regulatory -notmatch 'data-agency-vault' -or @([regex]::Matches($regulatory
 if ($regulatory -notmatch 'agency-vault__masthead' -or $regulatory -notmatch 'agency-vault__poster') {
     $failures.Add('The compact regulatory intelligence masthead or selector poster is missing.')
 }
-if ($styles -notmatch 'body\.page-id-13 \.entry\s*\{[\s\S]*?border:\s*0\s*!important' -or $styles -notmatch 'agency-vault__masthead::before') {
-    $failures.Add('The regulatory outer-frame removal or top-rule masthead treatment is missing.')
+if ($styles -match 'body\.page-id-13 \.entry\s*\{[\s\S]*?border:\s*0\s*!important' -or $styles -notmatch 'agency-vault__masthead::before' -or $styles -notmatch '\.content-sidebar-wrap > \.content\s*\{[\s\S]*?width:\s*100%\s*!important') {
+    $failures.Add('Regulatory must use the shared full-width page frame while preserving its dossier masthead.')
 }
 if ($script -notmatch 'centerDesktopDossier' -or $script -notmatch "behavior:\s*'smooth'") {
     $failures.Add('The regulatory desktop dossier-centering behavior is missing.')

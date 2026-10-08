@@ -356,15 +356,18 @@ try {
             const entry = document.querySelector('.entry');
             const vault = document.querySelector('.agency-vault');
             const masthead = document.querySelector('.agency-vault__masthead');
+            const content = document.querySelector('.content');
             const entryStyle = entry && getComputedStyle(entry);
+            const entryRect = entry && entry.getBoundingClientRect();
+            const contentRect = content && content.getBoundingClientRect();
             const vaultRect = vault && vault.getBoundingClientRect();
             const mastheadRect = masthead && masthead.getBoundingClientRect();
             return {
-              outerBorderRemoved: Boolean(entryStyle && parseFloat(entryStyle.borderTopWidth) === 0 && parseFloat(entryStyle.borderRightWidth) === 0 && parseFloat(entryStyle.borderBottomWidth) === 0 && parseFloat(entryStyle.borderLeftWidth) === 0),
+              sharedOuterFrame: Boolean(entryStyle && parseFloat(entryStyle.borderTopWidth) === 1 && entryRect && contentRect && Math.abs(entryRect.left - contentRect.left) < 2 && Math.abs(entryRect.right - contentRect.right) < 2),
               mastheadCutsTopRule: Boolean(vaultRect && mastheadRect && mastheadRect.top >= vaultRect.top - 1 && mastheadRect.top <= vaultRect.top + 2),
             };
           });
-          if (!regulatoryFrameState.outerBorderRemoved) failures.push(`${viewport.name} ${route}: obsolete outer page frame is still visible`);
+          if (!regulatoryFrameState.sharedOuterFrame) failures.push(`${viewport.name} ${route}: regulatory page is missing the shared full-width page frame`);
           if (!regulatoryFrameState.mastheadCutsTopRule) failures.push(`${viewport.name} ${route}: masthead labels do not interrupt the vault top rule`);
 
           const initialAlignment = await page.evaluate(() => {
