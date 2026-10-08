@@ -84,6 +84,16 @@ try {
             centerDelta: tableRect && cardRowRect
               ? Math.abs((tableRect.left + tableRect.width / 2) - (cardRowRect.left + cardRowRect.width / 2))
               : null,
+            phoneGrid: table && cardRow && links.length === 6
+              ? (() => {
+                  const cells = [...table.querySelectorAll('td')].map((cell) => cell.getBoundingClientRect());
+                  return {
+                    columns: new Set(cells.map((rect) => Math.round(rect.left))).size,
+                    rows: new Set(cells.map((rect) => Math.round(rect.top))).size,
+                    tableScrollable: table.scrollWidth > table.clientWidth + 1,
+                  };
+                })()
+              : null,
           };
         });
         if (footerPhoneState.count && (footerPhoneState.count !== 6 || !footerPhoneState.allCallable || !footerPhoneState.noBottomDash)) {
@@ -91,6 +101,13 @@ try {
         }
         if (viewport.name !== 'phone' && footerPhoneState.centerDelta !== null && footerPhoneState.centerDelta > 2) {
           failures.push(`${viewport.name} ${route}: Company Locations cards are not centered in their footer frame (${footerPhoneState.centerDelta}px)`);
+        }
+        if (viewport.name === 'phone' && footerPhoneState.phoneGrid && (
+          footerPhoneState.phoneGrid.columns !== 2
+          || footerPhoneState.phoneGrid.rows !== 3
+          || footerPhoneState.phoneGrid.tableScrollable
+        )) {
+          failures.push(`${viewport.name} ${route}: Company Locations does not form the approved two-column mobile grid (${JSON.stringify(footerPhoneState.phoneGrid)})`);
         }
 
         if (route === '/') {
