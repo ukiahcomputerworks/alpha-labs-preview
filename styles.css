@@ -1933,7 +1933,7 @@ button::after, .button::after { animation-duration: 5.1s; animation-delay: -2.7s
 .alpha-after-dark__content {
   margin: 0 auto;
   max-width: var(--alpha-max);
-  padding: 72px 56% 86px 0;
+  padding: 72px min(56%, 660px) 86px 0;
   position: relative;
   width: calc(100% - 48px);
   z-index: 2;
