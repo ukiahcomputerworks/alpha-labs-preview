@@ -91,6 +91,8 @@ class PublicContentLinks(HTMLParser):
             return
         if tag == "a" and attributes.get("href"):
             self.current_anchor = {"href": attributes["href"], "text": []}
+        if tag == "area" and attributes.get("href"):
+            self.links.append((attributes["href"], compact(attributes.get("alt") or attributes.get("title") or ""), "document"))
         if tag == "img" and "program-work-img" in attributes.get("class", "").split():
             source = attributes.get("src")
             if source:
@@ -246,6 +248,7 @@ def main() -> int:
     args = argparse.ArgumentParser(description=__doc__)
     args.add_argument("--local-only", action="store_true", help="Do not discover newly linked files from the live public source pages")
     args.add_argument("--max-documents", type=int, default=0, help="Bounded diagnostic run; use with --output outside the site root")
+    args.add_argument("--inventory-only", action="store_true", help="List eligible link counts without fetching files or writing an index")
     args.add_argument("--output", type=Path, default=ROOT / "document-search-index.json")
     options = args.parse_args()
     manifest = json.loads((ROOT / "mirror-manifest.json").read_text(encoding="utf-8"))
@@ -267,6 +270,10 @@ def main() -> int:
     for url, item in previous.items():
         if url not in inventory and failed_routes.intersection(item.get("sourcePages", [])):
             inventory[url] = {"href": item["href"], "title": item["title"], "kind": item["kind"], "sourcePages": set(item["sourcePages"])}
+    if options.inventory_only:
+        image_count = sum(item["kind"] == "image" for item in inventory.values())
+        print(f"Eligible first-party files: {len(inventory)} ({len(inventory) - image_count} linked documents, {image_count} service-sheet images); source-page failures: {len(source_failures)}")
+        return 0
     candidates = sorted(inventory.items())
     if options.max_documents:
         candidates = candidates[: options.max_documents]
