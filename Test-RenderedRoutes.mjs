@@ -86,6 +86,10 @@ try {
             const specsHeading = document.querySelector('.entry-content > h2');
             const bodyCopy = [...document.querySelectorAll('.entry-content > p, .entry-content li')];
             const actionCards = [...document.querySelectorAll('.alpha-action-rail > a')];
+            const heroContent = document.querySelector('.alpha-after-dark__content');
+            const heroActions = document.querySelector('.alpha-after-dark__actions');
+            const heroContentRect = heroContent?.getBoundingClientRect();
+            const heroActionsRect = heroActions?.getBoundingClientRect();
             const referenceH1 = document.createElement('h1');
             const referenceH2 = document.createElement('h2');
             referenceH1.style.cssText = referenceH2.style.cssText = 'position:fixed;visibility:hidden;pointer-events:none';
@@ -124,6 +128,10 @@ try {
               bodyCopyReadable,
               actionRailTreatment,
               actionRailStaggered,
+              compactHeroFits: !heroContentRect || !heroActionsRect || (
+                heroContentRect.top >= -1
+                && heroActionsRect.bottom <= window.innerHeight + 1
+              ),
             };
           });
           if (homeStoryState.heroTitleMarkup !== "The science is serious.<br><span>The experience doesn't have to be.</span>") failures.push(`${viewport.name} ${route}: approved Alpha After Dark hero changed`);
@@ -132,13 +140,24 @@ try {
           if (!homeStoryState.headingsAreGold || !homeStoryState.headingSizesPreserved) failures.push(`${viewport.name} ${route}: homepage headings are not gold or their established sizes changed`);
           if (!homeStoryState.bodyCopyReadable) failures.push(`${viewport.name} ${route}: homepage body copy is not solid white and larger than the base text`);
           if (!homeStoryState.actionRailTreatment || !homeStoryState.actionRailStaggered) failures.push(`${viewport.name} ${route}: homepage action rail is missing the gold-and-white treatment or independent shimmer timing`);
+          if (viewport.name === 'compact-desktop' && !homeStoryState.compactHeroFits) failures.push(`${viewport.name} ${route}: homepage hero actions are clipped below the viewport`);
         }
 
         if (route === '/contact-us-alpha-analytical-laboratories-inc/') {
-          const mapWidth = await page.locator('.california-map').evaluate((map) => map.getBoundingClientRect().width);
-          const expectedMapWidth = viewport.name === 'phone' ? 320.32 : 358.4;
-          if (Math.abs(mapWidth - expectedMapWidth) > 1) {
-            failures.push(`${viewport.name} ${route}: California locator width is ${mapWidth}px instead of ${expectedMapWidth}px`);
+          const mapState = await page.locator('.california-map').evaluate((map) => {
+            const mapRect = map.getBoundingClientRect();
+            const labels = [...map.querySelectorAll('.alpha-map-pin > span:last-child')]
+              .map((label) => label.getBoundingClientRect());
+            return {
+              width: mapRect.width,
+              mapInViewport: mapRect.left >= 0 && mapRect.right <= window.innerWidth,
+              labelsInViewport: labels.every((rect) => rect.left >= 0 && rect.right <= window.innerWidth),
+            };
+          });
+          const desktopMapWidthCorrect = Math.abs(mapState.width - 358.4) <= 1;
+          const phoneMapWidthReadable = mapState.width >= 240;
+          if ((viewport.name === 'phone' ? !phoneMapWidthReadable : !desktopMapWidthCorrect) || !mapState.mapInViewport || !mapState.labelsInViewport) {
+            failures.push(`${viewport.name} ${route}: California locator or a city label is clipped or undersized (${JSON.stringify(mapState)})`);
           }
 
           const locations = [
