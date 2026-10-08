@@ -1469,6 +1469,18 @@ table.locations td:nth-child(4) :is(.street-view-link, .street-view-link > span)
 table.locations td:nth-child(5) :is(.street-view-link, .street-view-link > span) { animation-delay: -4.5s; }
 table.locations td:nth-child(6) :is(.street-view-link, .street-view-link > span) { animation-delay: -2.9s; }
 table.locations .phone-link { border-bottom: 0; }
+
+/* Center the complete six-laboratory card row inside the full-width footer frame
+   when the viewport has room for it. Narrow screens retain the existing
+   left-origin horizontal overflow behavior so every card remains reachable. */
+@media (min-width: 1400px) {
+  table.locations > tbody {
+    display: table;
+    margin-inline: auto;
+    width: max-content;
+  }
+}
+
 .location-directory {
   display: flex;
   flex-wrap: wrap;

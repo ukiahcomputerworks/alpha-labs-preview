@@ -72,14 +72,24 @@ try {
 
         const footerPhoneState = await page.evaluate(() => {
           const links = [...document.querySelectorAll('table.locations .phone-link')];
+          const table = document.querySelector('table.locations');
+          const cardRow = table?.querySelector('tbody');
+          const tableRect = table?.getBoundingClientRect();
+          const cardRowRect = cardRow?.getBoundingClientRect();
           return {
             count: links.length,
             allCallable: links.every((link) => link.getAttribute('href')?.startsWith('tel:+1')),
             noBottomDash: links.every((link) => getComputedStyle(link).borderBottomWidth === '0px'),
+            centerDelta: tableRect && cardRowRect
+              ? Math.abs((tableRect.left + tableRect.width / 2) - (cardRowRect.left + cardRowRect.width / 2))
+              : null,
           };
         });
         if (footerPhoneState.count && (footerPhoneState.count !== 6 || !footerPhoneState.allCallable || !footerPhoneState.noBottomDash)) {
           failures.push(`${viewport.name} ${route}: Company Locations phone links lost their call targets or still show the uneven bottom dash`);
+        }
+        if (viewport.name !== 'phone' && footerPhoneState.centerDelta !== null && footerPhoneState.centerDelta > 2) {
+          failures.push(`${viewport.name} ${route}: Company Locations cards are not centered in their footer frame (${footerPhoneState.centerDelta}px)`);
         }
 
         if (route === '/') {
