@@ -38,11 +38,11 @@ foreach ($item in $manifest) {
     if ($html -notmatch '<meta name="viewport" content="width=device-width, initial-scale=1"') {
         $failures.Add("Missing responsive viewport: $($item.Route)")
     }
-    if ($html -notmatch 'styles\.css\?v=66') {
-        $failures.Add("Missing Alpha After Dark design cache key v66: $($item.Route)")
+    if ($html -notmatch 'styles\.css\?v=67') {
+        $failures.Add("Missing Alpha After Dark design cache key v67: $($item.Route)")
     }
-    if ($html -notmatch 'script\.js\?v=16') {
-        $failures.Add("Missing Alpha After Dark behavior cache key v16: $($item.Route)")
+    if ($html -notmatch 'script\.js\?v=17') {
+        $failures.Add("Missing Alpha After Dark behavior cache key v17: $($item.Route)")
     }
     $contactNavPosition = $html.IndexOf('id="menu-item-170"')
     $regulatoryNavPosition = $html.IndexOf('id="menu-item-176"')
@@ -87,7 +87,7 @@ if ($script -notmatch 'panel\.hidden = panel\.dataset\.locationPanel !== selecte
 }
 
 $services = Get-Content -Raw -LiteralPath (Join-Path $root 'services-listing\index.html')
-foreach ($serviceMarker in @('Our Testing &amp; Analytical Services', 'Certified environmental testing for Northern California.', 'Drinking &amp; Bottled Water', 'Wastewater, Recycled &amp; Storm Water', 'POTW Pretreatment Programs', 'Soil, Sediment &amp; Hazardous Waste', 'Title 21, Title 22, and Disinfectant By-Product compliance analyses', 'California Toxics Rule (CTR)', 'POTW Discharge Permits', '24-hour auto-sampler installations', 'Full SW846 testing', 'UST compliance', 'trout survival bioassays', 'WaterTrax Partner:')) {
+foreach ($serviceMarker in @('Our Testing &amp; Analytical Services', 'Two sides of water.', 'One laboratory.', 'One of the few labs built for both', 'Alpha is proud to be one of the few laboratories providing both drinking-water and wastewater testing across California.', 'Drinking &amp; Bottled Water', 'Wastewater', 'POTW Pretreatment', 'Soil &amp; Hazardous Waste', 'Title 21 and Title 22 compliance', 'Disinfection by-product analysis', 'California Toxics Rule low-level reporting', 'POTW discharge permits and field sampling', 'WaterTrax')) {
     if (-not $services.Contains($serviceMarker)) { $failures.Add("Missing approved Services Listing copy: $serviceMarker") }
 }
 foreach ($serviceTarget in @('drinking-bottled-water-program/', 'wastewater-recycled-water-storm-water-ground-water-program-work/', 'potw-pretreatment-program-work/', 'soil-sludge-sediment-haz-waste-characterization/')) {
@@ -95,6 +95,12 @@ foreach ($serviceTarget in @('drinking-bottled-water-program/', 'wastewater-recy
 }
 if ($services -notmatch 'mailto:robbie@alpha-labs\.com' -or $services -notmatch 'https://aquaticinformatics\.com/products/wastewater-compliance-software/' -or $services -match 'Read More&#8230;') {
     $failures.Add('The Services Listing actions, official WaterTrax destination, or redundant Read More cleanup are incomplete.')
+}
+if ($services -notmatch 'data-service-vault' -or @([regex]::Matches($services, 'data-service-target=')).Count -ne 2 -or @([regex]::Matches($services, 'data-service-panel=')).Count -ne 2) {
+    $failures.Add('The two-program Services selector or its paired testing dossiers are incomplete.')
+}
+if ($styles -notmatch '\.service-vault\s*\{' -or $styles -notmatch 'grid-template-columns:\s*minmax\(280px, \.78fr\) minmax\(410px, 1\.22fr\)' -or $script -notmatch 'selectService') {
+    $failures.Add('The stacked-left Services selector, right-hand dossier, or accessible switching behavior is missing.')
 }
 
 $regulatory = Get-Content -Raw -LiteralPath (Join-Path $root 'regulatory\index.html')

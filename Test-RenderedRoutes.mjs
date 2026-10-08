@@ -226,27 +226,65 @@ try {
           const servicesState = await page.evaluate(() => {
             const titleElement = document.querySelector('.entry-title');
             const titleStyle = titleElement && getComputedStyle(titleElement);
-            const headings = [...document.querySelectorAll('.entry-content h2')];
-            const sectionStyle = headings[0] && getComputedStyle(headings[0]);
-            const watertrax = document.querySelector('.entry-content blockquote a');
+            const tabs = [...document.querySelectorAll('[data-service-target]')];
+            const panels = [...document.querySelectorAll('[data-service-panel]')];
+            const activeTab = document.querySelector('[data-service-target].is-active');
+            const visiblePanels = panels.filter((panel) => !panel.hidden);
+            const rail = document.querySelector('.service-index__rail');
+            const dossier = document.querySelector('.service-intelligence');
+            const watertrax = document.querySelector('.service-support a[href^="https://aquaticinformatics.com/"]');
             const email = document.querySelector('.entry-content a[href="mailto:robbie@alpha-labs.com"]');
+            const potw = document.querySelector('.service-support a[href$="/potw-pretreatment-program-work/"]');
+            const soil = document.querySelector('.service-support a[href$="/soil-sludge-sediment-haz-waste-characterization/"]');
+            const tabRects = tabs.map((tab) => tab.getBoundingClientRect());
+            const railRect = rail?.getBoundingClientRect();
+            const dossierRect = dossier?.getBoundingClientRect();
             return {
               title: titleElement?.textContent.trim(),
               titleFitsOneLine: Boolean(titleElement && titleStyle && titleElement.scrollWidth <= titleElement.clientWidth + 1 && titleElement.clientHeight <= parseFloat(titleStyle.lineHeight) + 2 && titleStyle.whiteSpace === 'nowrap'),
-              titleLargerThanSections: Boolean(titleStyle && sectionStyle && parseFloat(titleStyle.fontSize) > parseFloat(sectionStyle.fontSize)),
               titleShimmersGold: Boolean(titleStyle && titleStyle.backgroundClip === 'text' && titleStyle.animationName.includes('alpha-contact-link-shimmer')),
-              linkedServices: headings.length === 4 && headings.every((heading) => heading.querySelector('a[href]')),
+              tabCount: tabs.length,
+              panelCount: panels.length,
+              activeTarget: activeTab?.dataset.serviceTarget,
+              visiblePanel: visiblePanels[0]?.dataset.servicePanel,
+              visiblePanelCount: visiblePanels.length,
+              testsInVisiblePanel: visiblePanels[0]?.querySelectorAll('.service-test-list li').length,
+              tabsStacked: tabRects.length === 2 && Math.abs(tabRects[0].width - tabRects[1].width) < 2 && tabRects[1].top > tabRects[0].bottom,
+              desktopColumns: Boolean(railRect && dossierRect && dossierRect.left > railRect.right),
+              mobileStack: Boolean(railRect && dossierRect && dossierRect.top > railRect.bottom),
+              drinkingHref: document.querySelector('#service-panel-drinking .service-primary-action')?.href,
+              wastewaterHref: document.querySelector('#service-panel-wastewater .service-primary-action')?.href,
               watertraxHref: watertrax?.href,
+              potwHref: potw?.href,
+              soilHref: soil?.href,
               emailHref: email?.getAttribute('href'),
               oldReadMore: document.querySelector('.entry-content')?.textContent.includes('Read More'),
             };
           });
-          if (servicesState.title !== 'Our Testing & Analytical Services' || !servicesState.linkedServices || servicesState.watertraxHref !== 'https://aquaticinformatics.com/products/wastewater-compliance-software/' || servicesState.emailHref !== 'mailto:robbie@alpha-labs.com' || servicesState.oldReadMore) {
+          if (servicesState.title !== 'Our Testing & Analytical Services' || servicesState.tabCount !== 2 || servicesState.panelCount !== 2 || servicesState.activeTarget !== 'drinking' || servicesState.visiblePanel !== 'drinking' || servicesState.visiblePanelCount !== 1 || servicesState.testsInVisiblePanel < 6 || servicesState.watertraxHref !== 'https://aquaticinformatics.com/products/wastewater-compliance-software/' || servicesState.emailHref !== 'mailto:robbie@alpha-labs.com' || !servicesState.potwHref?.endsWith('/potw-pretreatment-program-work/') || !servicesState.soilHref?.endsWith('/soil-sludge-sediment-haz-waste-characterization/') || servicesState.oldReadMore) {
             failures.push(`${viewport.name} ${route}: approved service copy or direct actions are incomplete`);
           }
+          if (!servicesState.drinkingHref?.endsWith('/drinking-bottled-water-program/') || !servicesState.wastewaterHref?.endsWith('/wastewater-recycled-water-storm-water-ground-water-program-work/')) failures.push(`${viewport.name} ${route}: primary water-program destinations changed`);
           if (!servicesState.titleFitsOneLine) failures.push(`${viewport.name} ${route}: service title does not fit on one line`);
-          if (viewport.name !== 'phone' && !servicesState.titleLargerThanSections) failures.push(`${viewport.name} ${route}: service title is not larger than section titles`);
           if (!servicesState.titleShimmersGold) failures.push(`${viewport.name} ${route}: service title is missing its gold shimmer`);
+          if (!servicesState.tabsStacked) failures.push(`${viewport.name} ${route}: the two water program cards are not stacked`);
+          if (viewport.name === 'phone' ? !servicesState.mobileStack : !servicesState.desktopColumns) failures.push(`${viewport.name} ${route}: service selector and dossier are not in the approved responsive arrangement`);
+
+          await page.locator('[data-service-target="wastewater"]').click();
+          const wastewaterState = await page.evaluate(() => ({
+            activeTarget: document.querySelector('[data-service-target].is-active')?.dataset.serviceTarget,
+            visiblePanels: [...document.querySelectorAll('[data-service-panel]')].filter((panel) => !panel.hidden).map((panel) => panel.dataset.servicePanel),
+            tests: document.querySelector('[data-service-panel="wastewater"]')?.querySelectorAll('.service-test-list li').length,
+          }));
+          if (wastewaterState.activeTarget !== 'wastewater' || wastewaterState.visiblePanels.length !== 1 || wastewaterState.visiblePanels[0] !== 'wastewater' || wastewaterState.tests < 6) failures.push(`${viewport.name} ${route}: wastewater selection did not release only its detailed test dossier`);
+
+          await page.locator('[data-service-target="drinking"]').focus();
+          await page.keyboard.press('ArrowDown');
+          const keyboardState = await page.evaluate(() => ({
+            focusTarget: document.activeElement?.dataset?.servicePanel || document.activeElement?.dataset?.serviceTarget,
+            activeTarget: document.querySelector('[data-service-target].is-active')?.dataset.serviceTarget,
+          }));
+          if (keyboardState.focusTarget !== 'wastewater' || keyboardState.activeTarget !== 'wastewater') failures.push(`${viewport.name} ${route}: keyboard navigation did not select and focus the wastewater dossier`);
         }
 
         if (route === '/regulatory/') {

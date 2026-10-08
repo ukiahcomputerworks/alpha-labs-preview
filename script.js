@@ -110,6 +110,60 @@ if (locationRoom) {
   });
 }
 
+document.querySelectorAll('[data-service-vault]').forEach((vault) => {
+  const tabs = [...vault.querySelectorAll('[data-service-target]')];
+  const panels = [...vault.querySelectorAll('[data-service-panel]')];
+  const dossier = vault.querySelector('.service-intelligence');
+  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+  const selectService = (tab, moveFocus = false) => {
+    const target = tab.dataset.serviceTarget;
+
+    tabs.forEach((candidate) => {
+      const selected = candidate === tab;
+      candidate.classList.toggle('is-active', selected);
+      candidate.setAttribute('aria-selected', String(selected));
+      candidate.tabIndex = selected ? 0 : -1;
+    });
+
+    let activePanel = null;
+    panels.forEach((panel) => {
+      const selected = panel.dataset.servicePanel === target;
+      panel.hidden = !selected;
+      panel.classList.toggle('is-active', selected);
+      if (selected) activePanel = panel;
+    });
+
+    if (dossier && !reducedMotion.matches) {
+      dossier.classList.remove('is-receiving');
+      requestAnimationFrame(() => dossier.classList.add('is-receiving'));
+    }
+
+    if (window.matchMedia('(max-width: 900px)').matches && dossier) {
+      dossier.scrollIntoView({ behavior: reducedMotion.matches ? 'auto' : 'smooth', block: 'start' });
+    }
+
+    if (moveFocus && activePanel) {
+      activePanel.focus({ preventScroll: true });
+    }
+  };
+
+  tabs.forEach((tab, index) => {
+    tab.addEventListener('click', () => selectService(tab));
+    tab.addEventListener('keydown', (event) => {
+      let nextIndex = null;
+      if (event.key === 'ArrowDown' || event.key === 'ArrowRight') nextIndex = (index + 1) % tabs.length;
+      if (event.key === 'ArrowUp' || event.key === 'ArrowLeft') nextIndex = (index - 1 + tabs.length) % tabs.length;
+      if (event.key === 'Home') nextIndex = 0;
+      if (event.key === 'End') nextIndex = tabs.length - 1;
+      if (nextIndex === null) return;
+      event.preventDefault();
+      tabs[nextIndex].focus();
+      selectService(tabs[nextIndex], true);
+    });
+  });
+});
+
 document.querySelectorAll('[data-agency-vault]').forEach((vault) => {
   const agencyButtons = [...vault.querySelectorAll('[data-agency-target]')];
   const agencyPanels = [...vault.querySelectorAll('[data-agency-panel]')];
