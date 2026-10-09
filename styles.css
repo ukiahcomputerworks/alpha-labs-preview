@@ -236,7 +236,7 @@
   text-shadow: 0 2px 12px #000;
   text-transform: uppercase;
 }
-.service-tab__copy small { color: var(--alpha-gold-bright); font-family: var(--alpha-display); font-size: .7rem; font-weight: 700; letter-spacing: .15em; line-height: 1.2; text-transform: uppercase; }
+.service-tab__copy small { background: rgba(0, 0, 0, .82); border-radius: .12rem; box-shadow: 0 0 12px 3px rgba(0, 0, 0, .35); color: var(--alpha-gold-bright); font-family: var(--alpha-display); font-size: .7rem; font-weight: 700; letter-spacing: .15em; line-height: 1.2; padding: .2rem .35rem; text-shadow: 0 1px 3px #000; text-transform: uppercase; width: fit-content; max-width: 100%; }
 .service-tab__copy > span { color: #fff; font-size: .72rem; line-height: 1.35; opacity: .84; }
 .service-tab__arrow { bottom: 1.15rem; color: var(--alpha-gold-bright); font-size: 1.55rem; position: absolute; right: 1.1rem; z-index: 3; }
 
