@@ -154,7 +154,7 @@
   padding: 0 !important;
   position: relative;
   text-align: left;
-  transition: box-shadow .24s ease, translate .24s ease;
+  transition: box-shadow .24s ease;
   width: 100%;
 }
 
@@ -178,7 +178,7 @@
 
 .service-tab::after {
   animation: none !important;
-  background: linear-gradient(180deg, rgba(0,0,0,.04) 10%, rgba(0,0,0,.35) 52%, rgba(0,0,0,.92) 100%);
+  background: linear-gradient(180deg, transparent 35%, rgba(0,0,0,.12) 58%, rgba(0,0,0,.82) 100%);
   content: "";
   inset: 0;
   pointer-events: none;
@@ -191,23 +191,23 @@
   inset: 0;
   object-fit: cover;
   position: absolute;
-  transition: filter .3s ease, opacity .3s ease, transform .45s ease;
+  filter: none;
+  opacity: 1;
+  transform: none;
   width: 100% !important;
   z-index: 0;
 }
-.service-tab:not(.is-active) .service-tab__image { filter: grayscale(.32) brightness(.66); opacity: .82; }
-
+#service-tab-wastewater .service-tab__image { object-position: 62% 40%; }
+/* Both programs stay fully illuminated on touch screens. Interaction changes
+   the gold frame only, never the photograph's brightness, crop or position. */
 .service-tab:hover,
-.service-tab:focus-visible { box-shadow: 0 0 0 1px #fff1ad, 0 0 30px rgba(255, 210, 79, .24); translate: .3rem 0; }
-.service-tab:hover .service-tab__image,
-.service-tab:focus-visible .service-tab__image { filter: brightness(.95); transform: scale(1.035); }
+.service-tab:focus-visible { box-shadow: 0 0 0 1px #fff1ad, 0 0 30px rgba(255, 210, 79, .24); }
 .service-tab:focus-visible { outline: 2px solid #fff1ad !important; outline-offset: 4px; }
 
 .service-tab.is-active {
   background: #050505 !important;
   box-shadow: 0 0 0 1px rgba(255, 241, 173, .72), 0 18px 42px rgba(0, 0, 0, .44), 0 0 34px rgba(255, 210, 79, .12);
   color: #fff !important;
-  translate: .45rem 0;
 }
 .service-tab.is-active::before { animation-duration: 4.9s; filter: brightness(1.28); padding: 3px; }
 
@@ -402,7 +402,6 @@
   .entry-content .service-vault__poster h2 { font-size: clamp(1.7rem, 9vw, 2.45rem) !important; }
   .entry-content .service-vault__poster > p:last-child { font-size: .92rem !important; }
   .service-tab { height: 205px; padding: 0 !important; }
-  .service-tab.is-active { translate: .25rem 0; }
   .service-tab__copy { bottom: .9rem; left: .9rem; right: 3rem; }
   .service-tab__copy strong { font-size: 1.2rem; }
   .service-tab__copy small { font-size: .62rem; }
@@ -428,6 +427,7 @@
   .service-intelligence.is-receiving,
   .service-tab::before { animation: none; }
   .service-tab { scroll-behavior: auto; transition: none; }
+  .service-tab__image { transition: none; }
 }
 
 /* Regulatory agency vault: original agency artwork inside an Alpha After Dark reveal system. */
