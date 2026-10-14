@@ -1,0 +1,55 @@
+/* ComputerWorks.ai colophon: inherits the site's own footer palette. */
+#cwu-colophon.cwu-colophon {
+  box-sizing: border-box;
+  display: flex !important;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px 20px;
+  grid-column: 1 / -1;
+  width: calc(100% - 32px);
+  max-width: 1280px;
+  margin: 12px auto 0;
+  padding: 12px 0 10px;
+  border-top: 1px solid currentColor;
+  color: inherit;
+  font-family: inherit;
+  font-size: 12px;
+  line-height: 1.6;
+  text-align: left;
+  letter-spacing: normal;
+  text-transform: none;
+}
+#cwu-colophon .cwu-colophon-credit,
+#cwu-colophon .cwu-colophon-status {
+  display: block !important;
+  color: inherit;
+  font-size: 12px;
+  line-height: 1.6;
+  letter-spacing: normal;
+  text-transform: none;
+}
+#cwu-colophon a.cwu-colophon-brand {
+  display: inline !important;
+  color: inherit;
+  background: none;
+  padding: 3px 0;
+  margin: 0;
+  border: 0;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.6;
+  letter-spacing: normal;
+  text-transform: none;
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 4px;
+}
+#cwu-colophon a.cwu-colophon-brand:hover { text-decoration-thickness: 2px; }
+#cwu-colophon a.cwu-colophon-brand:focus-visible { outline: 2px solid currentColor; outline-offset: 4px; }
+#cwu-colophon a.cwu-colophon-brand::before,
+#cwu-colophon a.cwu-colophon-brand::after { content: none !important; }
+@media (max-width: 480px) {
+  #cwu-colophon.cwu-colophon { justify-content: flex-start; gap: 4px 16px; }
+}
