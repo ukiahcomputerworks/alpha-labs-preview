@@ -14,12 +14,37 @@ def pages(root):
     tracked = subprocess.run(['git', '-C', str(root), 'ls-files', '--cached', '--others', '--exclude-standard', '*.html'], capture_output=True, text=True, check=True).stdout.splitlines()
     return [root / name for name in sorted(set(tracked)) if not any(part in {'source', '.deps', 'node_modules', 'captures', 'scripts', 'templates'} for part in Path(name).parts)]
 
+def integrate(text, template, target):
+    footer_start = text.lower().rfind('<footer')
+    footer_end = text.lower().rfind('</footer>')
+    region = text[footer_start:footer_end]
+    found = None
+    for match in re.finditer(r'<div\b[^>]*>', region, re.I):
+        classes = re.search(r'class=["\x27]([^"\x27]*)', match.group(), re.I)
+        if classes and target in classes.group(1).split():
+            found = match
+            break
+    if found:
+        depth = 1
+        closing = None
+        for match in re.finditer(r'</?div\b[^>]*>', region[found.end():], re.I):
+            depth += -1 if match.group().startswith('</') else 1
+            if depth == 0:
+                closing = found.end() + match.start()
+                break
+        if closing is None:
+            raise ValueError('Unbalanced existing footer container: ' + target)
+        opening = found.group()
+        if target != 'footer-meta' and 'cwu-legal-row' not in opening:
+            opening = re.sub(r'(class=["\x27])', r'\1cwu-legal-row ', opening, count=1)
+        region = region[:found.start()] + opening + region[found.end():closing] + template + region[closing:]
+        return text[:footer_start] + region + text[footer_end:]
+    return text[:footer_end] + template + text[footer_end:]
+
 def apply(root, check=False):
     root = Path(root)
     config = json.loads((root / 'site-colophon.json').read_text(encoding='utf-8'))
     template = (root / 'scripts' / 'colophon.html').read_text(encoding='utf-8').strip()
-    if not config.get('preview', True):
-        template = template.replace('  <span class="cwu-colophon-status">Independent Website Preview</span>\n', '')
     rendered = skipped = changed = 0
     failures = []
     for path in pages(root):
@@ -31,19 +56,19 @@ def apply(root, check=False):
         prefix = '../' * (len(path.relative_to(root).parts) - 1)
         csslink = '<link rel="stylesheet" href="' + prefix + 'assets/cwu-colophon.css" data-cwu-colophon="true">'
         if check:
-            if original.count('id="cwu-colophon"') != 1 or original.count(START) != 1 or csslink not in original or 'href="https://computerworks.ai/"' not in original:
+            if original.count('id="cwu-colophon"') != 1 or original.count(START) != 1 or csslink not in original or template not in original:
                 failures.append(str(path.relative_to(root)))
             continue
         text = LINK.sub('', BLOCK.sub('', original))
+        if config.get('ownerAssumesMediaOwnership'):
+            text = re.sub(r'<span>Source photo credit:.*?</span>', '', text, flags=re.S)
         text = re.sub(r'Independent design review\s*(?:&middot;|&#183;|.)\s*Source photo credit:', 'Source photo credit:', text)
         text = re.sub(r'</head\s*>', csslink + '\n</head>', text, count=1, flags=re.I)
         if re.search(r'</footer\s*>', text, re.I):
-            # Last footer is the site's bottom footer, not a nested article footer.
-            matches = list(re.finditer(r'</footer\s*>', text, re.I))
-            match = matches[-1]
-            text = text[:match.start()] + '\n' + template + '\n' + text[match.start():]
+            text = integrate(text, template, config.get('footerContainer', 'footer-base'))
         else:
             text = re.sub(r'</body\s*>', '<footer class="cwu-preview-footer">\n' + template + '\n</footer>\n</body>', text, count=1, flags=re.I)
+        text = re.sub(r'[ \t]+\n(?=<!-- CWU COLOPHON START -->)', '\n', text)
         if text != original:
             path.write_text(text, encoding='utf-8')
             changed += 1
